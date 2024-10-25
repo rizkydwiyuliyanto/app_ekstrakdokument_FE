@@ -20,10 +20,17 @@ import PropTypes from "prop-types";
 
 // Custom styles for MDInput
 import MDInputRoot from "components/MDInput/MDInputRoot";
+import { FormControl, TextField } from "@mui/material";
 
-const MDInput = forwardRef(({ error, success, disabled, ...rest }, ref) => (
-  <MDInputRoot {...rest} ref={ref} ownerState={{ error, success, disabled }} />
-));
+const MDInput = forwardRef(
+  ({ error, success, disabled, Color = "primary", DefaultValue, ...rest }, ref) => (
+    <>
+      <FormControl fullWidth>
+        <TextField {...rest} ref={ref} color={Color} />
+      </FormControl>
+    </>
+  )
+);
 
 // Setting default values for the props of MDInput
 MDInput.defaultProps = {
@@ -37,6 +44,8 @@ MDInput.propTypes = {
   error: PropTypes.bool,
   success: PropTypes.bool,
   disabled: PropTypes.bool,
+  Color: PropTypes.string,
+  DefaultValue: PropTypes.string,
 };
 
 export default MDInput;

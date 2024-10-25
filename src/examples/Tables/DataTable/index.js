@@ -38,6 +38,15 @@ import MDPagination from "components/MDPagination";
 // Material Dashboard 2 React example components
 import DataTableHeadCell from "examples/Tables/DataTable/DataTableHeadCell";
 import DataTableBodyCell from "examples/Tables/DataTable/DataTableBodyCell";
+import { Button, FormControl, TextField } from "@mui/material";
+
+const InputFilter = ({ ...rest }) => {
+  return (
+    <FormControl>
+      <TextField {...rest} />
+    </FormControl>
+  );
+};
 
 function DataTable({
   entriesPerPage,
@@ -46,6 +55,7 @@ function DataTable({
   table,
   pagination,
   isSorted,
+  ReloadData,
   noEndBorder,
 }) {
   const defaultValue = entriesPerPage.defaultValue ? entriesPerPage.defaultValue : 10;
@@ -144,7 +154,31 @@ function DataTable({
   } else {
     entriesEnd = pageSize * (pageIndex + 1);
   }
-
+  const [formFilter, setFormFilter] = useState({});
+  const handleClick = () => {
+    ReloadData(formFilter);
+  };
+  const handleChange = (e) => {
+    setFormFilter({
+      ...formFilter,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const notColumnFilter = ["action"];
+  useEffect(() => {
+    let obj = {};
+    columns
+      .filter((y) => {
+        return !notColumnFilter.includes(y?.Header);
+      })
+      .forEach((prop, idx) => {
+        obj = {
+          ...obj,
+          [prop?.Header]: "",
+        };
+      });
+    setFormFilter(obj);
+  }, []);
   return (
     <TableContainer sx={{ boxShadow: "none" }}>
       {entriesPerPage || canSearch ? (
@@ -185,6 +219,36 @@ function DataTable({
       ) : null}
       <Table {...getTableProps()}>
         <MDBox component="thead">
+          <TableRow>
+            {columns
+              .filter((y) => {
+                return !notColumnFilter.includes(y?.Header);
+              })
+              .map((x, idx) => {
+                return (
+                  <DataTableBodyCell key={idx}>
+                    <InputFilter
+                      onBlur={handleChange}
+                      placeholder={`Search ${x?.Header.split("_").join(" ")}`}
+                      size={"small"}
+                      name={x?.Header}
+                    />
+                  </DataTableBodyCell>
+                );
+              })}
+            <DataTableBodyCell>
+              <Button
+                onClick={() => {
+                  handleClick();
+                }}
+                size={"small"}
+              >
+                Filter
+              </Button>
+            </DataTableBodyCell>
+          </TableRow>
+        </MDBox>
+        <MDBox component="thead">
           {headerGroups.map((headerGroup, key) => (
             <TableRow key={key} {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column, idx) => (
@@ -195,7 +259,7 @@ function DataTable({
                   align={column.align ? column.align : "left"}
                   sorted={setSortedValue(column)}
                 >
-                  {column.render("Header")}
+                  {column.render("Header").split("_").join(" ")}
                 </DataTableHeadCell>
               ))}
             </TableRow>
@@ -206,16 +270,22 @@ function DataTable({
             prepareRow(row);
             return (
               <TableRow key={key} {...row.getRowProps()}>
-                {row.cells.map((cell, idx) => (
-                  <DataTableBodyCell
-                    key={idx}
-                    noBorder={noEndBorder && rows.length - 1 === key}
-                    align={cell.column.align ? cell.column.align : "left"}
-                    {...cell.getCellProps()}
-                  >
-                    {cell.render("Cell")}
-                  </DataTableBodyCell>
-                ))}
+                {row.cells.length > 0 ? (
+                  <>
+                    {row.cells.map((cell, idx) => (
+                      <DataTableBodyCell
+                        key={idx}
+                        noBorder={noEndBorder && rows.length - 1 === key}
+                        align={cell.column.align ? cell.column.align : "left"}
+                        {...cell.getCellProps()}
+                      >
+                        {cell.render("Cell")}
+                      </DataTableBodyCell>
+                    ))}
+                  </>
+                ) : (
+                  <DataTableBodyCell>Data masih Kosong</DataTableBodyCell>
+                )}
               </TableRow>
             );
           })}
@@ -305,6 +375,7 @@ DataTable.propTypes = {
     ]),
   }),
   isSorted: PropTypes.bool,
+  ReloadData: PropTypes.func,
   noEndBorder: PropTypes.bool,
 };
 

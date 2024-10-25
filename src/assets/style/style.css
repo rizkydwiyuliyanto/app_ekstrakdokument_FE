@@ -1,0 +1,29 @@
+.file-upload {
+    background-color: #F4F4F4;
+    padding: 0.85em 1em;
+    border-radius: 7px;
+    display: flex;
+    margin-bottom: 12px;
+    align-items: flex-start;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+.file-upload::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background-color: #EB4844;
+}
+.label-file-upload {
+  display: inline-block;
+  background-color: #616367;
+  color: white;
+  padding: 0.5rem;
+  font-size: 14px;
+  border-radius: 0.3rem;
+  cursor: pointer;
+}

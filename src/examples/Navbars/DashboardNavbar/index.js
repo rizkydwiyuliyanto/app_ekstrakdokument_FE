@@ -13,10 +13,10 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 
 // react-router components
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate, Navigate } from "react-router-dom";
 
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
@@ -27,6 +27,7 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import Icon from "@mui/material/Icon";
+import { Logout } from "@mui/icons-material";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -53,13 +54,17 @@ import {
   setOpenConfigurator,
 } from "context";
 
+import { Content } from "context/user-context";
+
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
+  const [openProfileMenu, setOpenprofileMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
-
+  const { setUser } = useContext(Content);
+  const navigate = useNavigate();
   useEffect(() => {
     // Setting the navbar type
     if (fixedNavbar) {
@@ -90,9 +95,30 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
+  const logOut = () => {
+    setUser(null);
+    navigate("/authentication/sign-in");
+  };
+  const renderProfileMenu = () => (
+    <Menu
+      anchorEl={openProfileMenu}
+      anchorReference={null}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "left",
+      }}
+      open={Boolean(openProfileMenu)}
+      onClose={() => {
+        setOpenprofileMenu(false);
+      }}
+      sx={{ mt: 2 }}
+    >
+      <NotificationItem onClick={logOut} icon={<Logout color={"error"} />} title="Log out" />
+    </Menu>
+  );
 
   // Render the notifications menu
-  const renderMenu = () => (
+  const renderNotifMenu = () => (
     <Menu
       anchorEl={openMenu}
       anchorReference={null}
@@ -139,11 +165,18 @@ function DashboardNavbar({ absolute, light, isMini }) {
               <MDInput label="Search here" />
             </MDBox>
             <MDBox color={light ? "white" : "inherit"}>
-              <Link to="/authentication/sign-in/basic">
-                <IconButton sx={navbarIconButton} size="small" disableRipple>
-                  <Icon sx={iconsStyle}>account_circle</Icon>
-                </IconButton>
-              </Link>
+              <IconButton
+                sx={navbarIconButton}
+                size="small"
+                color="inherit"
+                onClick={(event) => {
+                  setOpenprofileMenu(event.currentTarget);
+                }}
+                disableRipple
+              >
+                <Icon sx={iconsStyle}>account_circle</Icon>
+              </IconButton>
+              {renderProfileMenu()}
               <IconButton
                 size="small"
                 disableRipple
@@ -176,7 +209,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               >
                 <Icon sx={iconsStyle}>notifications</Icon>
               </IconButton>
-              {renderMenu()}
+              {renderNotifMenu()}
             </MDBox>
           </MDBox>
         )}

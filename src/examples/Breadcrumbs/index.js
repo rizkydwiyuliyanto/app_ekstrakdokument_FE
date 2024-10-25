@@ -26,10 +26,12 @@ import Icon from "@mui/material/Icon";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
 
 function Breadcrumbs({ icon, title, route, light }) {
-  const routes = route.slice(0, -1);
-
+  const routeItems = route.slice(0, -1);
+  const { userId } = useParams();
   return (
     <MDBox mr={{ xs: 0, xl: 8 }}>
       <MuiBreadcrumbs
@@ -50,21 +52,29 @@ function Breadcrumbs({ icon, title, route, light }) {
             <Icon>{icon}</Icon>
           </MDTypography>
         </Link>
-        {routes.map((el) => (
-          <Link to={`/${el}`} key={el}>
-            <MDTypography
-              component="span"
-              variant="button"
-              fontWeight="regular"
-              textTransform="capitalize"
-              color={light ? "white" : "dark"}
-              opacity={light ? 0.8 : 0.5}
-              sx={{ lineHeight: 0 }}
-            >
-              {el}
-            </MDTypography>
-          </Link>
-        ))}
+        {routeItems.map((el, idx) => {
+          let link = `/${route.slice(0, idx + 1).join("/")}`;
+          if (idx > 0) {
+            if (userId) {
+              link += `/${userId}`;
+            }
+          }
+          return (
+            <Link to={link} key={el}>
+              <MDTypography
+                component="span"
+                variant="button"
+                fontWeight="regular"
+                textTransform="capitalize"
+                color={light ? "white" : "dark"}
+                opacity={light ? 0.8 : 0.5}
+                sx={{ lineHeight: 0 }}
+              >
+                {el.split("_").join(" ")}
+              </MDTypography>
+            </Link>
+          );
+        })}
         <MDTypography
           variant="button"
           fontWeight="regular"
@@ -72,10 +82,10 @@ function Breadcrumbs({ icon, title, route, light }) {
           color={light ? "white" : "dark"}
           sx={{ lineHeight: 0 }}
         >
-          {title.replace("-", " ")}
+          {title.split("_").join(" ")}
         </MDTypography>
       </MuiBreadcrumbs>
-      <MDTypography
+      {/* <MDTypography
         fontWeight="bold"
         textTransform="capitalize"
         variant="h6"
@@ -83,7 +93,7 @@ function Breadcrumbs({ icon, title, route, light }) {
         noWrap
       >
         {title.replace("-", " ")}
-      </MDTypography>
+      </MDTypography> */}
     </MDBox>
   );
 }
@@ -99,6 +109,7 @@ Breadcrumbs.propTypes = {
   title: PropTypes.string.isRequired,
   route: PropTypes.oneOfType([PropTypes.string, PropTypes.array]).isRequired,
   light: PropTypes.bool,
+  location: PropTypes.any,
 };
 
 export default Breadcrumbs;

@@ -13,7 +13,7 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState } from "react";
+import { useContext, useRef, useState } from "react";
 
 // react-router-dom components
 import { Link } from "react-router-dom";
@@ -34,20 +34,64 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-
+import RadioInput from "components/RadioInput";
+import GridParent from "components/GridParent";
+import GridItems from "components/GridItems";
 // Authentication layout components
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 
 // Images
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import CoverLayout from "../components/CoverLayout";
+import { Col, Row } from "react-bootstrap";
+import { signIn } from "request/request";
+import { Content } from "context/user-context";
+import { useNavigate, Navigate, useLocation } from "react-router-dom";
+import privateRoutes from "private_routes";
+
+const changeRoute = (role) => {
+  let { route } = privateRoutes.find((x) => {
+    return x.role === role;
+  });
+  return route;
+};
 
 function Basic() {
   const [rememberMe, setRememberMe] = useState(false);
-
+  const { user, setUser } = useContext(Content);
+  const formRef = useRef("");
+  const navigate = useNavigate();
+  const location = useLocation();
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
-
+  const handleClick = () => {
+    const formData = new FormData(formRef.current);
+    let obj;
+    formData.forEach((val, key) => {
+      if (val) {
+        obj = {
+          ...obj,
+          [key]: val,
+        };
+      }
+    });
+    signIn({ link: "auth/sign-in", data: obj })
+      .then((res) => {
+        if (res) {
+          setUser(res.data);
+          navigate(changeRoute(obj?.role));
+        } else {
+          console.log("Login Gagal");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  if (user?.role) {
+    return <Navigate to={changeRoute(user?.role)} replace state={{ from: location }} />;
+  }
   return (
-    <BasicLayout image={bgImage}>
+    <CoverLayout image={bgImage}>
       <Card>
         <MDBox
           variant="gradient"
@@ -60,10 +104,10 @@ function Basic() {
           mb={1}
           textAlign="center"
         >
-          <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
+          <MDTypography variant="h4" fontWeight="medium" color="white">
             Sign in
           </MDTypography>
-          <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
+          {/* <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
             <Grid item xs={2}>
               <MDTypography component={MuiLink} href="#" variant="body1" color="white">
                 <FacebookIcon color="inherit" />
@@ -79,17 +123,39 @@ function Basic() {
                 <GoogleIcon color="inherit" />
               </MDTypography>
             </Grid>
-          </Grid>
+          </Grid> */}
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form">
-            <MDBox mb={2}>
-              <MDInput type="email" label="Email" fullWidth />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput type="password" label="Password" fullWidth />
-            </MDBox>
-            <MDBox display="flex" alignItems="center" ml={-1}>
+          <MDBox component="form" role="form" ref={formRef}>
+            <GridParent>
+              <GridItems>
+                <Col md={6} xs={12}>
+                  <MDInput type="text" name={"username"} label="Username" fullWidth />
+                </Col>
+                <Col md={6} xs={12}>
+                  <MDInput type="password" name={"password"} label="Password" fullWidth />
+                </Col>
+              </GridItems>
+              <GridItems>
+                <Col md={12}>
+                  <RadioInput
+                    Label={"Role"}
+                    Name={"role"}
+                    Items={[
+                      {
+                        value: "prodi",
+                        label: "Prodi",
+                      },
+                      {
+                        value: "admin",
+                        label: "Admin",
+                      },
+                    ]}
+                  />
+                </Col>
+              </GridItems>
+            </GridParent>
+            {/* <MDBox display="flex" alignItems="center" ml={-1}>
               <Switch checked={rememberMe} onChange={handleSetRememberMe} />
               <MDTypography
                 variant="button"
@@ -100,9 +166,9 @@ function Basic() {
               >
                 &nbsp;&nbsp;Remember me
               </MDTypography>
-            </MDBox>
+            </MDBox> */}
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
+              <MDButton HandleClick={handleClick} variant="gradient" color="info" fullWidth>
                 sign in
               </MDButton>
             </MDBox>
@@ -124,7 +190,7 @@ function Basic() {
           </MDBox>
         </MDBox>
       </Card>
-    </BasicLayout>
+    </CoverLayout>
   );
 }
 

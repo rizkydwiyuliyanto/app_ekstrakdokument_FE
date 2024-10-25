@@ -15,7 +15,8 @@ Coded by www.creative-tim.com
 
 // react-router-dom components
 import { Link } from "react-router-dom";
-
+import { Content } from "context/user-context";
+import { Navigate, useLocation } from "react-router-dom";
 // @mui material components
 import Card from "@mui/material/Card";
 import Checkbox from "@mui/material/Checkbox";
@@ -31,8 +32,20 @@ import CoverLayout from "layouts/authentication/components/CoverLayout";
 
 // Images
 import bgImage from "assets/images/bg-sign-up-cover.jpeg";
-
+import privateRoutes from "private_routes";
+import { useContext } from "react";
+const changeRoute = (role) => {
+  let { route } = privateRoutes.find((x) => {
+    return x.role === role;
+  });
+  return route;
+};
 function Cover() {
+  const { user } = useContext(Content);
+  const location = useLocation();
+  if (user?.role) {
+    return <Navigate to={changeRoute(user?.role)} replace state={{ from: location }} />;
+  }
   return (
     <CoverLayout image={bgImage}>
       <Card>

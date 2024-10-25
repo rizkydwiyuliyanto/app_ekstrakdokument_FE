@@ -36,7 +36,7 @@ function DefaultProjectCard({ image, label, title, description, action, authors 
       <MDAvatar
         src={media}
         alt={name}
-        size="xs"
+        size="sm"
         sx={({ borders: { borderWidth }, palette: { white } }) => ({
           border: `${borderWidth[2]} solid ${white.main}`,
           cursor: "pointer",

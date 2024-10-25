@@ -22,15 +22,13 @@ import PropTypes from "prop-types";
 import MDAvatarRoot from "components/MDAvatar/MDAvatarRoot";
 
 const MDAvatar = forwardRef(({ bgColor, size, shadow, ...rest }, ref) => (
-  <MDAvatarRoot ref={ref} ownerState={{ shadow, bgColor, size }} {...rest} />
+  <MDAvatarRoot
+    style={{ objectFit: "cover" }}
+    ref={ref}
+    ownerState={{ shadow: "md", bgColor: "secondary", size: size }}
+    {...rest}
+  />
 ));
-
-// Setting default values for the props of MDAvatar
-MDAvatar.defaultProps = {
-  bgColor: "transparent",
-  size: "md",
-  shadow: "none",
-};
 
 // Typechecking props for the MDAvatar
 MDAvatar.propTypes = {
