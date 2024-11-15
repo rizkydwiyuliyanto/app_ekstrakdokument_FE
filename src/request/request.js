@@ -18,6 +18,17 @@ const signIn = async ({ link, data }) => {
   }
 };
 
+const checkInput = async ({ link, data }) => {
+  try {
+    const result = await instance.post(link, data);
+    return result;
+  } catch (err) {
+    let message = "";
+    message = err?.response?.data?.details[0]?.message;
+    throw message;
+  }
+};
+
 const create = async ({ link, data }) => {
   try {
     const result = await instance.post(link, data);
@@ -95,6 +106,7 @@ const getData = async ({ link }) => {
 
 // eslint-disable-next-line prettier/prettier
 export {
+  checkInput,
   create,
   getData,
   inputFoto,

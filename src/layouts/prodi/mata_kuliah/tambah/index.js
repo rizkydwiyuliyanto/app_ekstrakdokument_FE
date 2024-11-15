@@ -5,11 +5,8 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import GridParent from "components/GridParent";
 import MDButton from "components/MDButton";
-import TextArea from "components/TextArea";
 import BtnModal from "components/BtnModal";
-import SelectInput from "components/SelectInput";
 import InputCSV from "components/InputCSV";
-import DateInput from "components/DateInput";
 import { Col, Stack } from "react-bootstrap";
 import {
   HourglassFullRounded,
@@ -24,6 +21,7 @@ import CardParent from "components/CardParent";
 import { useNavigate } from "react-router-dom";
 import { readCSV } from "request/request";
 import { Content } from "context/user-context";
+
 const CSVData = ({ data, setData }) => {
   const formRef = React.useRef([]);
   const refWait = React.useRef([]);
@@ -52,19 +50,18 @@ const CSVData = ({ data, setData }) => {
     let obj = {
       id_jurusan: user.id_jurusan,
     };
-    const dates = ["tanggal_lahir"];
     formData.forEach((val, key) => {
       if (val) {
         obj = {
           ...obj,
-          [key]: dates.includes(key) ? new Date(val) : val,
+          [key]: val,
         };
       }
     });
     refWait.current[currentIdx].style.display = "block";
     refError.current[currentIdx].style.display = "none";
     refSuccess.current[currentIdx].style.display = "none";
-    create({ link: "mahasiswa/input", data: obj })
+    create({ link: "mata_kuliah/input", data: obj })
       .then((res) => {
         refWait.current[currentIdx].style.display = "none";
         refSuccess.current[currentIdx].style.display = "flex";
@@ -88,40 +85,29 @@ const CSVData = ({ data, setData }) => {
     let idx = 0;
     postData(idx);
   };
-  console.log("TEST");
-  console.log(user);
   return (
     <>
       <div style={{ overflowX: "scroll", padding: "1em 0", marginBottom: "12px" }}>
         <Stack gap={3}>
           <div style={{ width: "1200px" }}>
             <Stack direction={"horizontal"} gap={3}>
-              <Col sm={"1"}>
-                <Typography variant={"h6"}>NPM</Typography>
-              </Col>
-              <Col sm={"2"}>
-                <Typography variant={"h6"} align={"center"}>
-                  Nama depan
-                </Typography>
-              </Col>
-              <Col sm={"2"}>
-                <Typography variant={"h6"} align={"center"}>
-                  Nama belakang
-                </Typography>
-              </Col>
-              <Col sm={"2"}>
-                <Typography variant={"h6"} align={"center"}>
-                  No.HP
-                </Typography>
-              </Col>
-              <Col sm={"2"}>
-                <Typography variant={"h6"}>Tanggal lahir</Typography>
-              </Col>
-              <Col sm={"2"}>
-                <Typography variant={"h6"}>JK</Typography>
+              <Col sm={"3"}>
+                <Typography variant={"h6"}>ID Matakuliah</Typography>
               </Col>
               <Col sm={"3"}>
-                <Typography variant={"h6"}>Alamat</Typography>
+                <Typography variant={"h6"} align={"center"}>
+                  Mata kuliah
+                </Typography>
+              </Col>
+              <Col sm={"3"}>
+                <Typography variant={"h6"} align={"center"}>
+                  Semester
+                </Typography>
+              </Col>
+              <Col sm={"3"}>
+                <Typography variant={"h6"} align={"center"}>
+                  SKS
+                </Typography>
               </Col>
             </Stack>
           </div>
@@ -175,56 +161,21 @@ const CSVData = ({ data, setData }) => {
                     direction={"horizontal"}
                     gap={3}
                   >
-                    <Col sm={"1"}>
-                      <TextField name={"npm"} defaultValue={x["npm"]} fullWidth />
-                    </Col>
-                    <Col sm={"2"}>
-                      <TextField name={"nama_depan"} defaultValue={x["nama_depan"]} fullWidth />
-                    </Col>
-                    <Col sm={"2"}>
+                    <Col sm={"3"}>
                       <TextField
-                        name={"nama_belakang"}
-                        defaultValue={x["nama_belakang"]}
+                        name={"id_mata_kuliah"}
+                        defaultValue={x["id_mata_kuliah"]}
                         fullWidth
-                      />
-                    </Col>
-                    <Col sm={"2"}>
-                      <TextField name={"no_hp"} defaultValue={x["no_hp"]} fullWidth />
-                    </Col>
-                    <Col sm={"2"}>
-                      <DateInput
-                        // key={"OKAYG_" + (10000 + Math.random() * (1000000 - 10000))}
-                        dateValue={x["tanggal_lahir"]}
-                        name={"tanggal_lahir"}
-                        id={"tanggal_lahir"}
-                      />
-                    </Col>
-                    <Col sm={"2"}>
-                      <SelectInput
-                        defaultValue={x["jenis_kelamin"]}
-                        style={{ height: "45px", padding: "1em 0" }}
-                        // key={"OKAYG_" + (10000 + Math.random() * (1000000 - 10000))}
-                        Name={"jenis_kelamin"}
-                        Items={[
-                          {
-                            value: "Laki-laki",
-                            label: "Laki-laki",
-                          },
-                          {
-                            value: "Perempuan",
-                            label: "Perempuan",
-                          },
-                        ]}
                       />
                     </Col>
                     <Col sm={"3"}>
-                      <TextArea
-                        size={"small"}
-                        defaultValue={x["alamat"]}
-                        Name={"alamat"}
-                        fullWidth
-                      />
-                      {/* <TextField size={"small"} defaultValue={x["alamat"]} fullWidth /> */}
+                      <TextField name={"mata_kuliah"} defaultValue={x["mata_kuliah"]} fullWidth />
+                    </Col>
+                    <Col sm={"3"}>
+                      <TextField name={"semester"} defaultValue={x["semester"]} fullWidth />
+                    </Col>
+                    <Col sm={"3"}>
+                      <TextField name={"sks"} defaultValue={x["sks"]} fullWidth />
                     </Col>
                   </Stack>
                 </form>
@@ -267,6 +218,7 @@ const index = ({ ReloadData, HandleClose }) => {
   const navigate = useNavigate();
   const [csvData, setCSVData] = React.useState([]);
   const [files, setFiles] = React.useState();
+  const formRef = React.useRef("");
   const handleCSV = (e) => {
     const { files, name } = e.target;
     setFiles(files[0]);
@@ -274,7 +226,7 @@ const index = ({ ReloadData, HandleClose }) => {
   const nextClick = () => {
     const formData = new FormData();
     formData.append("csv", files);
-    readCSV({ link: "mahasiswa/read_csv", formData: formData })
+    readCSV({ link: "mata_kuliah/read_csv", formData: formData })
       .then((res) => {
         const { data } = res;
         console.log(data);
@@ -288,7 +240,7 @@ const index = ({ ReloadData, HandleClose }) => {
     <>
       <DashboardLayout>
         <DashboardNavbar />
-        <CardParent Title={"Form tambah mahasiswa"}>
+        <CardParent Title={"Form tambah matakuliah"}>
           {csvData.length > 0 ? (
             <CSVData data={csvData} setData={setCSVData} />
           ) : (

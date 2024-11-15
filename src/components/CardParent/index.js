@@ -4,11 +4,11 @@ import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
-const index = ({ Title, ButtonComponent, children }) => {
+const index = ({ Title, ButtonComponent, Size = 12, children }) => {
   return (
     <MDBox pt={6} pb={3}>
-      <Grid container spacing={6}>
-        <Grid item xs={12}>
+      <Grid container spacing={6} alignItems={"center"} justifyContent={"center"}>
+        <Grid item xs={Size}>
           <Card>
             <MDBox
               mx={2}

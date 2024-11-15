@@ -226,12 +226,12 @@ function DataTable({
               })
               .map((x, idx) => {
                 return (
-                  <DataTableBodyCell key={idx}>
+                  <DataTableBodyCell key={idx} align={x.align ? x.align : "left"}>
                     <InputFilter
                       onBlur={handleChange}
                       placeholder={`Search ${x?.Header.split("_").join(" ")}`}
                       size={"small"}
-                      name={x?.Header}
+                      name={x?.name}
                     />
                   </DataTableBodyCell>
                 );

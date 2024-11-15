@@ -34,15 +34,21 @@ import { useEffect, useRef, useState } from "react";
 import MDButton from "components/MDButton";
 import { Container, Typography } from "@mui/material";
 import CardParent from "components/CardParent";
+import ButtonLinkCard from "components/ButtonCardLink";
 import Link from "@mui/material/Link";
-import { useLocation, NavLink } from "react-router-dom";
 function Tables() {
   const [id, setId] = useState("");
   const { dataMahasiswa, loading_mhs, reload_mhs } = tableMahasiswa({
     header: [
-      { Header: "mahasiswa", accessor: "mahasiswa", width: "40%", align: "left" },
-      { Header: "npm", accessor: "npm", align: "left" },
-      { Header: "no_hp", accessor: "no_hp", align: "center" },
+      {
+        Header: "mahasiswa",
+        accessor: "mahasiswa",
+        name: "mahasiswa",
+        width: "40%",
+        align: "left",
+      },
+      { Header: "npm", accessor: "npm", name: "npm", align: "left" },
+      { Header: "no_hp", accessor: "no_hp", name: "no_hp", align: "center" },
       // { Header: "employed", accessor: "employed", align: "center" },
       { Header: "action", accessor: "action", align: "center" },
     ],
@@ -52,9 +58,9 @@ function Tables() {
 
   const { dataDosen, loading_dsn, reload_dsn } = tableDosen({
     header: [
-      { Header: "dosen", accessor: "dosen", width: "40%", align: "left" },
-      { Header: "nidn", accessor: "nidn", align: "left" },
-      { Header: "no_hp", accessor: "no_hp", align: "center" },
+      { Header: "dosen", accessor: "dosen", name: "dosen", width: "40%", align: "left" },
+      { Header: "nidn", accessor: "nidn", name: "nidn", align: "left" },
+      { Header: "no_hp", accessor: "no_hp", name: "no_hp", align: "center" },
       // { Header: "employed", accessor: "employed", align: "center" },
       { Header: "action", accessor: "action", align: "center" },
     ],
@@ -70,14 +76,7 @@ function Tables() {
           <CardParent
             Title={"Data dosen"}
             ButtonComponent={() => {
-              return (
-                <NavLink to={"/master/tambah_dosen"}>
-                  <MDButton>Tambah data</MDButton>
-                </NavLink>
-                // <Link href={"/master/form"}>
-                //   <MDButton>Tambah data</MDButton>
-                // </Link>
-              );
+              return <ButtonLinkCard Text={"Tambah data"} Link={"/master/tambah_dosen"} />;
             }}
           >
             {loading_dsn ? (
@@ -98,11 +97,7 @@ function Tables() {
           <CardParent
             Title={"Data mahasiswa"}
             ButtonComponent={() => {
-              return (
-                <NavLink to={"/master/tambah_mahasiswa"}>
-                  <MDButton>Tambah data</MDButton>
-                </NavLink>
-              );
+              return <ButtonLinkCard Text={"Tambah data"} Link={"/master/tambah_mahasiswa"} />;
             }}
           >
             {loading_mhs ? (

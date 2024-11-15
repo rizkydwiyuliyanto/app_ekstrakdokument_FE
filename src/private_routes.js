@@ -36,14 +36,10 @@ Coded by www.creative-tim.com
 */
 
 // Material Dashboard 2 React layouts
-import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
-import Billing from "layouts/billing";
-import RTL from "layouts/rtl";
-import Notifications from "layouts/notifications";
-import Profile from "layouts/profile";
-import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
+// Admin
+import Dashboard from "layouts/admin/dashboard";
+import Prodi from "layouts/admin/prodi";
+import TambahProdi from "layouts/admin/prodi/tambah_data";
 // Dosen wali
 import Master from "layouts/master";
 import FormTambahMahasiswa from "layouts/master/tambah_mahasiswa";
@@ -53,6 +49,8 @@ import FormEditMahasiswa from "layouts/master/edit_mahasiswa";
 import FormTambahDosen from "layouts/master/tambah_dosen";
 import FormEditDosen from "layouts/master/edit_dosen";
 import Dashboardprodi from "layouts/dashboard_prodi";
+import MataKuliah from "layouts/prodi/mata_kuliah";
+import TambahMataKuliah from "layouts/prodi/mata_kuliah/tambah";
 import PrivateRoute from "components/PrivateRoute";
 
 // @mui icons
@@ -70,6 +68,33 @@ let admin = [
       <PrivateRoute>
         <Interceptor>
           <Dashboard />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+  {
+    role: "admin",
+    type: "collapse",
+    name: "Prodi",
+    key: "prodi",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "/prodi",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <Prodi />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+  {
+    role: "admin",
+    type: "sub_menu",
+    route: "/prodi/tambah",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <TambahProdi />
         </Interceptor>
       </PrivateRoute>
     ),
@@ -175,6 +200,34 @@ let prodi = [
       <PrivateRoute>
         <Interceptor>
           <DetailDosen />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+  {
+    role: "prodi",
+    type: "collapse",
+    name: "Mata kuliah",
+    key: "matakuliah",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "/matakuliah",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <MataKuliah />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+  {
+    role: "prodi",
+    type: "sub_menu",
+    // name: "tambah_dosen",
+    route: "/matakuliah/tambah_matakuliah",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <TambahMataKuliah />
         </Interceptor>
       </PrivateRoute>
     ),

@@ -2,7 +2,7 @@
 import { Typography } from "@mui/material";
 import { useEffect } from "react";
 
-const index = ({ HandleChange, Files }) => {
+const index = ({ HandleChange, Files, Type }) => {
     return (
         <>
             <div className="file-upload">
@@ -11,7 +11,7 @@ const index = ({ HandleChange, Files }) => {
                 </Typography>
                 <input
                     type={"file"}
-                    accept=".csv"
+                    accept={Type}
                     onChange={HandleChange}
                     style={{
                         marginBottom: "12px",

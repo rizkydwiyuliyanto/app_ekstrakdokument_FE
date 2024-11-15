@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable prettier/prettier */
 /**
 =========================================================
 * Material Dashboard 2 React - v2.2.0
@@ -13,7 +15,7 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 // @mui material components
 import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
@@ -42,20 +44,208 @@ import PlatformSettings from "layouts/master/detail_mahasiswa/components/Platfor
 // Data
 import profilesListData from "layouts/master/detail_mahasiswa/data/profilesListData";
 // Images
-import homeDecor1 from "assets/images/home-decor-1.jpg";
-import homeDecor2 from "assets/images/home-decor-2.jpg";
-import homeDecor3 from "assets/images/home-decor-3.jpg";
-import homeDecor4 from "assets/images/home-decor-4.jpeg";
-import team1 from "assets/images/team-1.jpg";
-import team2 from "assets/images/team-2.jpg";
-import team3 from "assets/images/team-3.jpg";
-import team4 from "assets/images/team-4.jpg";
+import { styled } from "@mui/material/styles";
 import { getData } from "request/request";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import MDButton from "components/MDButton";
+import FileUpload from "./FileUpload";
+import { Stack, Typography } from "@mui/material";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  "&:last-child td, &:last-child th": {
+    border: 0,
+  },
+}));
+
+const addZero = (x) => {
+  if (x < 10) return `0${x}`;
+  return x;
+}
+
+const PilihTanggal = (props) => {
+  const { TanggalKHS, SetSelectedDate, SelectedDate } = props;
+  const [idx, setIdx] = useState(0);
+  const currentDate = TanggalKHS.find(x => {
+    return x.id_khs === SelectedDate
+  }).tanggal_masuk;
+  const handleChange = (x) => {
+    setIdx(prev => prev += x)
+  };
+  const dateTxt = (x) => {
+    const dates = new Date(x);
+    return `${dates.getDate()}-${dates.getMonth() + 1}-${dates.getFullYear()}, ${addZero(dates.getHours())}:${addZero(dates.getMinutes())}:${addZero(dates.getSeconds())}`
+  }
+  useEffect(() => {
+    SetSelectedDate(TanggalKHS[idx].id_khs);
+  }, [idx]);
+  return (
+    <>
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between"
+      }}>
+        <MDButton color={"info"} size={"small"} disabled={idx === 0 ? true : false} HandleClick={() => handleChange(-1)}>Back</MDButton>
+        <div>
+          <Typography variant={"body2"}>{dateTxt(currentDate)}</Typography>
+        </div>
+        <MDButton color={"info"} size={"small"} disabled={idx === TanggalKHS.length - 1 ? true : false} HandleClick={() => handleChange(1)}>Next</MDButton>
+      </div>
+    </>
+  )
+}
+
+// eslint-disable-next-line react/prop-types
+const MataKuliah = ({ Id, SetLinkDownload }) => {
+  const [data, setData] = useState([]);
+  const [tanggalKHS, setTanggalKHS] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [nilaiKHS, setNilaiKHS] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const getKHS = async ({ id_khs }) => {
+    try {
+      const nilaiKHS = await getData({ link: `mahasiswa/get_nilai_khs/${id_khs}` });
+      setNilaiKHS(nilaiKHS.data);
+      // console.log(nilaiKHS)
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  const getTanggalKHS = () => {
+    getData({ link: `mahasiswa/get_khs/${Id}` })
+      .then((res) => {
+        const { data } = res;
+        setTanggalKHS(data);
+        if (data.length > 0) {
+          setSelectedDate(data[0].id_khs);
+          SetLinkDownload(data[0].file_csv)
+          getKHS({ id_khs: data[0].id_khs });
+        }
+        // console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  const getMataKuliah = () => {
+    getData({ link: "mata_kuliah/get_data" })
+      .then((res) => {
+        const { data } = res;
+        setData(data);
+        // console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const showNilai = (id_matkul) => {
+    const x = ["A", "B", "C"]
+    let result = "-";
+    const matKul = nilaiKHS.find(x => {
+      return x.id_mata_kuliah === id_matkul
+    });
+    // console.log(matKul);
+    if (matKul) {
+      if (x.includes(matKul?.nilai)) {
+        result = matKul?.nilai;
+      }
+    }
+    return result
+  }
+
+  useEffect(() => {
+    getTanggalKHS();
+    getMataKuliah();
+  }, []);
+  useEffect(() => {
+    if (tanggalKHS.length > 0) getKHS({ id_khs: selectedDate });
+  }, [selectedDate])
+  const semester = [1, 2, 3, 4, 5, 6, 7, 8];
+  return (
+    <>
+      <Grid container spacing={6}>
+        {tanggalKHS.length > 0
+          &&
+          <Grid item md={12} sx={{ padding: "0em 0.5em" }}>
+            <PilihTanggal
+              TanggalKHS={tanggalKHS}
+              SetSelectedDate={setSelectedDate}
+              SelectedDate={selectedDate}
+            />
+          </Grid>
+        }
+        {semester.map((x) => {
+          const matKul = data.filter((y) => {
+            return y.semester == x;
+          });
+          return (
+            <>
+              <Grid item md={12} sx={{ padding: "1em 0.5em", overflowX: "scroll", overflowY: "hidden" }}>
+                <TableContainer sx={{ width: "100%" }} component={Paper}>
+                  <Table sx={{ minWidth: 700 }}>
+                    <TableBody>
+                      <TableRow>
+                        <StyledTableCell>Kode mata kuliah</StyledTableCell>
+                        <StyledTableCell align="center">Mata kuliah</StyledTableCell>
+                        <StyledTableCell align="left">SKS</StyledTableCell>
+                        <StyledTableCell align="left">Semester</StyledTableCell>
+                        <StyledTableCell align="left">Nilai</StyledTableCell>
+                      </TableRow>
+                    </TableBody>
+                    <TableBody>
+                      {matKul.map((item) => {
+                        return (
+                          <>
+                            <StyledTableRow>
+                              <StyledTableCell>
+                                {item?.id_mata_kuliah}
+                              </StyledTableCell>
+                              <StyledTableCell>{item?.mata_kuliah}</StyledTableCell>
+                              <StyledTableCell align={"center"}>{item?.sks}</StyledTableCell>
+                              <StyledTableCell align={"center"}>{item?.semester}</StyledTableCell>
+                              <StyledTableCell align={"center"}>{tanggalKHS.length === 0 ? "-" : showNilai(item?.id_mata_kuliah)}</StyledTableCell>
+                            </StyledTableRow>
+                          </>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
+            </>
+          );
+        })}
+      </Grid>
+    </>
+  );
+};
 
 function Overview() {
   const [selected, setSelected] = useState({});
   const [loading, setLoading] = useState(true);
   const [tabValue, setTabValue] = useState(0);
+  const [linkDownload, setLinkDownload] = useState("");
+  const [open, setOpen] = useState(false);
   const { userId } = useParams();
 
   const getSelected = () => {
@@ -88,6 +278,8 @@ function Overview() {
         SetTabValue={setTabValue}
       >
         <MDBox mt={5} mb={3}>
+          {/* Form input PDF */}
+          <FileUpload Open={open} SetOpen={setOpen} Id={userId} />
           <Grid container spacing={1}>
             {tabValue === 0 && (
               <>
@@ -146,94 +338,32 @@ function Overview() {
             Projects
           </MDTypography>
           <MDBox mb={1}>
-            <MDTypography variant="button" color="text">
-              Architects design houses
-            </MDTypography>
+            <Stack sx={{ marginTop: "10px" }} direction={"row"} spacing={2}>
+              <MDButton
+                variant="gradient"
+                color="primary"
+                HandleClick={() => {
+                  console.log("ETE")
+                  setOpen(true);
+                }}
+              >
+                Update Nilai
+              </MDButton>
+              {linkDownload &&
+                <Link to={linkDownload}>
+                  <MDButton
+                    variant="gradient"
+                    color="success"
+                  >
+                    Download
+                  </MDButton>
+                </Link>
+              }
+            </Stack>
           </MDBox>
         </MDBox>
         <MDBox p={2}>
-          <Grid container spacing={6}>
-            <Grid item xs={12} md={6} xl={3}>
-              <DefaultProjectCard
-                image={homeDecor1}
-                label="project #2"
-                title="modern"
-                description="As Uber works through a huge amount of internal management turmoil."
-                action={{
-                  type: "internal",
-                  route: "/pages/master/detail_mahasiswa/profile-overview",
-                  color: "info",
-                  label: "view project",
-                }}
-                authors={[
-                  { image: team1, name: "Elena Morison" },
-                  { image: team2, name: "Ryan Milly" },
-                  { image: team3, name: "Nick Daniel" },
-                  { image: team4, name: "Peterson" },
-                ]}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} xl={3}>
-              <DefaultProjectCard
-                image={homeDecor2}
-                label="project #1"
-                title="scandinavian"
-                description="Music is something that everyone has their own specific opinion about."
-                action={{
-                  type: "internal",
-                  route: "/pages/master/detail_mahasiswa/profile-overview",
-                  color: "info",
-                  label: "view project",
-                }}
-                authors={[
-                  { image: team3, name: "Nick Daniel" },
-                  { image: team4, name: "Peterson" },
-                  { image: team1, name: "Elena Morison" },
-                  { image: team2, name: "Ryan Milly" },
-                ]}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} xl={3}>
-              <DefaultProjectCard
-                image={homeDecor3}
-                label="project #3"
-                title="minimalist"
-                description="Different people have different taste, and various types of music."
-                action={{
-                  type: "internal",
-                  route: "/pages/master/detail_mahasiswa/profile-overview",
-                  color: "info",
-                  label: "view project",
-                }}
-                authors={[
-                  { image: team4, name: "Peterson" },
-                  { image: team3, name: "Nick Daniel" },
-                  { image: team2, name: "Ryan Milly" },
-                  { image: team1, name: "Elena Morison" },
-                ]}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} xl={3}>
-              <DefaultProjectCard
-                image={homeDecor4}
-                label="project #4"
-                title="gothic"
-                description="Why would anyone pick blue over pink? Pink is obviously a better color."
-                action={{
-                  type: "internal",
-                  route: "/pages/master/detail_mahasiswa/profile-overview",
-                  color: "info",
-                  label: "view project",
-                }}
-                authors={[
-                  { image: team4, name: "Peterson" },
-                  { image: team3, name: "Nick Daniel" },
-                  { image: team2, name: "Ryan Milly" },
-                  { image: team1, name: "Elena Morison" },
-                ]}
-              />
-            </Grid>
-          </Grid>
+          <MataKuliah Id={userId} SetLinkDownload={setLinkDownload}/>
         </MDBox>
       </Header>
       <Footer />
