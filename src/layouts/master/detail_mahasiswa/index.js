@@ -335,7 +335,7 @@ function Overview() {
         </MDBox>
         <MDBox pt={2} px={2} lineHeight={1.25}>
           <MDTypography variant="h6" fontWeight="medium">
-            Projects
+            Nilai
           </MDTypography>
           <MDBox mb={1}>
             <Stack sx={{ marginTop: "10px" }} direction={"row"} spacing={2}>

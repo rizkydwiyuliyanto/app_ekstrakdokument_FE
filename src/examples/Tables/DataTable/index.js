@@ -311,11 +311,11 @@ function DataTable({
             variant={pagination.variant ? pagination.variant : "gradient"}
             color={pagination.color ? pagination.color : "info"}
           >
-            {canPreviousPage && (
+            {/* {canPreviousPage && (
               <MDPagination item onClick={() => previousPage()}>
                 <Icon sx={{ fontWeight: "bold" }}>chevron_left</Icon>
               </MDPagination>
-            )}
+            )} */}
             {renderPagination.length > 6 ? (
               <MDBox width="5rem" mx={1}>
                 <MDInput
@@ -327,11 +327,11 @@ function DataTable({
             ) : (
               renderPagination
             )}
-            {canNextPage && (
+            {/* {canNextPage && (
               <MDPagination item onClick={() => nextPage()}>
                 <Icon sx={{ fontWeight: "bold" }}>chevron_right</Icon>
               </MDPagination>
-            )}
+            )} */}
           </MDPagination>
         )}
       </MDBox>
