@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import * as React from "react";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -8,53 +9,279 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BtnModal from "components/BtnModal";
 import TextArea from "components/TextArea";
-import { Col } from "react-bootstrap";
+import { Col, Stack } from "react-bootstrap";
 import InputFoto from "components/InputFoto";
 import SelectInput from "components/SelectInput";
 import DateInput from "components/DateInput";
-import { Alert } from "@mui/material";
+import { Alert, TextField, Typography } from "@mui/material";
 import { create } from "request/request";
 import { inputFoto } from "request/request";
 import CardParent from "components/CardParent";
 import { useNavigate } from "react-router-dom";
+import InputCSV from "components/InputCSV";
+import {
+  HourglassFullRounded,
+  ErrorRounded,
+  CheckCircleRounded,
+  RemoveCircleRounded,
+} from "@mui/icons-material";
+import { readCSV } from "request/request";
+import { Content } from "context/user-context";
 
-// eslint-disable-next-line react/prop-types
-const index = ({ ReloadData, HandleClose }) => {
-  const formRef = React.useRef(null);
-  const [messageError, setMessageError] = React.useState("");
-  const navigate = useNavigate();
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(formRef.current);
-    let obj = {};
+const CSVData = ({ data, setData }) => {
+  const formRef = React.useRef([]);
+  const refWait = React.useRef([]);
+  const refError = React.useRef([]);
+  const refSuccess = React.useRef([]);
+  const [btnDisabled, setBtnDisabled] = React.useState(false);
+  const { user } = React.useContext(Content);
+  const postData = (idx) => {
+    let currentIdx = idx;
+    const can_continue = (time) => {
+      if (currentIdx < formRef.current.length - 1) {
+        let timeOut;
+        timeOut = setTimeout(() => {
+          currentIdx += 1;
+          postData(currentIdx);
+        }, time);
+      } else {
+        setBtnDisabled(false);
+      }
+    };
+    if (formRef.current[currentIdx].style.display === "none") {
+      can_continue(0);
+      return;
+    }
+    const formData = new FormData(formRef.current[currentIdx]);
+    let obj = {
+      id_jurusan: user.id_jurusan,
+    };
     const dates = ["tanggal_lahir"];
-    const file = ["foto"];
-    let fileFoto = new FormData();
     formData.forEach((val, key) => {
-      console.log(val);
       if (val) {
-        if (file.includes(key)) {
-          fileFoto.append(key, val);
-        } else {
-          obj = {
-            ...obj,
-            [key]: dates.includes(key) ? new Date(val) : val,
-          };
-        }
+        obj = {
+          ...obj,
+          [key]: dates.includes(key) ? new Date(val) : val,
+        };
       }
     });
+    refWait.current[currentIdx].style.display = "block";
+    refError.current[currentIdx].style.display = "none";
+    refSuccess.current[currentIdx].style.display = "none";
     create({ link: "dosen/input", data: obj })
       .then((res) => {
-        inputFoto({ link: `dosen/input_foto/${obj.nidn}`, formData: fileFoto })
-          .then((res) => {
-            setMessageError("");
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        refWait.current[currentIdx].style.display = "none";
+        refSuccess.current[currentIdx].style.display = "flex";
+        refSuccess.current[currentIdx].lastElementChild.textContent = "Data berhasil ditambah";
+        can_continue(450);
       })
       .catch((err) => {
-        setMessageError(err);
+        refWait.current[currentIdx].style.display = "none";
+        refError.current[currentIdx].style.display = "flex";
+        refError.current[currentIdx].lastElementChild.textContent = err;
+        can_continue(450);
+        // setMessageError(err);
+      });
+  };
+  const deleteData = (idx) => {
+    // const index = data.indexOf(idx);
+    formRef.current[idx].style.display = "none";
+  };
+  const handleClick = () => {
+    setBtnDisabled(true);
+    let idx = 0;
+    postData(idx);
+  };
+  return (
+    <>
+      <div style={{ overflowX: "scroll", padding: "1em 0", marginBottom: "12px" }}>
+        <Stack gap={3}>
+          <div style={{ width: "1200px" }}>
+            <Stack direction={"horizontal"} gap={3}>
+              <Col sm={"1"}>
+                <Typography variant={"h6"}>NIDN</Typography>
+              </Col>
+              <Col sm={"2"}>
+                <Typography variant={"h6"} align={"center"}>
+                  Nama depan
+                </Typography>
+              </Col>
+              <Col sm={"2"}>
+                <Typography variant={"h6"} align={"center"}>
+                  Nama belakang
+                </Typography>
+              </Col>
+              <Col sm={"2"}>
+                <Typography variant={"h6"} align={"center"}>
+                  No.HP
+                </Typography>
+              </Col>
+              <Col sm={"2"}>
+                <Typography variant={"h6"}>Tanggal lahir</Typography>
+              </Col>
+              <Col sm={"2"}>
+                <Typography variant={"h6"}>JK</Typography>
+              </Col>
+              <Col sm={"3"}>
+                <Typography variant={"h6"}>Alamat</Typography>
+              </Col>
+            </Stack>
+          </div>
+          {data.map((x, idx) => {
+            return (
+              <>
+                <form style={{ width: "1200px" }} ref={(el) => (formRef.current[idx] = el)}>
+                  <Stack direction={"vertical"} gap={2}>
+                    <div
+                      onClick={() => {
+                        deleteData(idx);
+                      }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        width: "fit-content",
+                        marginRight: "12px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <RemoveCircleRounded color={"error"} />
+                      <Typography variant={"caption"} sx={{ marginLeft: "7px" }}>
+                        Hapus
+                      </Typography>
+                    </div>
+                    <div>
+                      <div
+                        style={{ display: "none", alignItems: "center" }}
+                        ref={(el) => (refWait.current[idx] = el)}
+                      >
+                        <HourglassFullRounded />
+                      </div>
+                      <div
+                        style={{ display: "none", alignItems: "center" }}
+                        ref={(el) => (refError.current[idx] = el)}
+                      >
+                        <ErrorRounded />
+                        <Typography variant={"caption"} sx={{ marginLeft: "7px" }}></Typography>
+                      </div>
+                      <div
+                        style={{ display: "none", alignItems: "center" }}
+                        ref={(el) => (refSuccess.current[idx] = el)}
+                      >
+                        <CheckCircleRounded />
+                        <Typography variant={"caption"} sx={{ marginLeft: "7px" }}></Typography>
+                      </div>
+                    </div>
+                  </Stack>
+                  <Stack
+                    style={{ alignItems: "flex-start", marginTop: "7px" }}
+                    direction={"horizontal"}
+                    gap={3}
+                  >
+                    <Col sm={"1"}>
+                      <TextField name={"nidn"} defaultValue={x["nidn"]} fullWidth />
+                    </Col>
+                    <Col sm={"2"}>
+                      <TextField name={"nama_depan"} defaultValue={x["nama_depan"]} fullWidth />
+                    </Col>
+                    <Col sm={"2"}>
+                      <TextField
+                        name={"nama_belakang"}
+                        defaultValue={x["nama_belakang"]}
+                        fullWidth
+                      />
+                    </Col>
+                    <Col sm={"2"}>
+                      <TextField name={"no_hp"} defaultValue={x["no_hp"]} fullWidth />
+                    </Col>
+                    <Col sm={"2"}>
+                      <DateInput
+                        // key={"OKAYG_" + (10000 + Math.random() * (1000000 - 10000))}
+                        dateValue={x["tanggal_lahir"]}
+                        name={"tanggal_lahir"}
+                        id={"tanggal_lahir"}
+                      />
+                    </Col>
+                    <Col sm={"2"}>
+                      <SelectInput
+                        defaultValue={x["jenis_kelamin"]}
+                        style={{ height: "45px", padding: "1em 0" }}
+                        // key={"OKAYG_" + (10000 + Math.random() * (1000000 - 10000))}
+                        Name={"jenis_kelamin"}
+                        Items={[
+                          {
+                            value: "Laki-laki",
+                            label: "Laki-laki",
+                          },
+                          {
+                            value: "Perempuan",
+                            label: "Perempuan",
+                          },
+                        ]}
+                      />
+                    </Col>
+                    <Col sm={"3"}>
+                      <TextArea
+                        size={"small"}
+                        defaultValue={x["alamat"]}
+                        Name={"alamat"}
+                        fullWidth
+                      />
+                      {/* <TextField size={"small"} defaultValue={x["alamat"]} fullWidth /> */}
+                    </Col>
+                  </Stack>
+                </form>
+              </>
+            );
+          })}
+        </Stack>
+      </div>
+      <GridParent>
+        <BtnModal>
+          <MDButton
+            HandleClick={() => {
+              handleClick();
+            }}
+            disabled={btnDisabled}
+            variant="gradient"
+            color="info"
+            style={{ marginRight: "10px" }}
+          >
+            Submit
+          </MDButton>
+          <MDButton
+            HandleClick={() => {
+              setData([]);
+            }}
+            variant="gradient"
+            color="error"
+          >
+            Kembali
+          </MDButton>
+        </BtnModal>
+      </GridParent>
+    </>
+  );
+};
+
+// eslint-disable-next-line react/prop-types
+const index = () => {
+  const navigate = useNavigate();
+  const [csvData, setCSVData] = React.useState([]);
+  const [files, setFiles] = React.useState();
+  const handleCSV = (e) => {
+    const { files, name } = e.target;
+    setFiles(files[0]);
+  };
+  const nextClick = () => {
+    const formData = new FormData();
+    formData.append("csv", files);
+    readCSV({ link: "mahasiswa/read_csv", formData: formData })
+      .then((res) => {
+        const { data } = res;
+        setCSVData(data);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
   return (
@@ -62,91 +289,36 @@ const index = ({ ReloadData, HandleClose }) => {
       <DashboardLayout>
         <DashboardNavbar />
         <CardParent Title={"Form tambah dosen"}>
-          {messageError && (
-            <Alert
-              severity="error"
-              sx={{ marginBottom: "17px" }}
-              onClose={() => {
-                setMessageError("");
-              }}
-            >
-              {messageError}
-            </Alert>
+          {csvData.length > 0 ? (
+            <CSVData data={csvData} setData={setCSVData} />
+          ) : (
+            <>
+              <InputCSV HandleChange={handleCSV} Files={files} Type={".csv"} />
+              <GridParent>
+                <BtnModal>
+                  <MDButton
+                    HandleClick={() => {
+                      if (files) nextClick();
+                    }}
+                    variant="gradient"
+                    color="info"
+                    style={{ marginRight: "10px" }}
+                  >
+                    Next
+                  </MDButton>
+                  <MDButton
+                    HandleClick={() => {
+                      navigate(-1);
+                    }}
+                    variant="gradient"
+                    color="error"
+                  >
+                    Kembali
+                  </MDButton>
+                </BtnModal>
+              </GridParent>
+            </>
           )}
-          <form ref={formRef}>
-            <GridParent>
-              <GridItems>
-                <Col md={4} xs={12}>
-                  {/* https://stackoverflow.com/questions/30792526/defaultvalue-change-does-not-re-render-input */}
-                  <MDInput name={"nama_depan"} label="Nama depan *" fullWidth />
-                </Col>
-                <Col md={4} xs={12}>
-                  <MDInput name={"nama_belakang"} label="Nama belakang" fullWidth />
-                </Col>
-                <Col md={4} xs={12}>
-                  <MDInput name={"nidn"} label="NIDN *" />
-                </Col>
-              </GridItems>
-              <GridItems>
-                <Col md={4} xs={12}>
-                  <DateInput
-                    dateValue={new Date()}
-                    name={"tanggal_lahir"}
-                    id={"tanggal_lahir"}
-                    labelText={"Tanggal lahir"}
-                  />
-                </Col>
-                <Col md={4} xs={12}>
-                  <MDInput name={"no_hp"} label="Nomor HP *" fullWidth />
-                </Col>
-                <Col md={4} xs={12}>
-                  <SelectInput
-                    Name={"jenis_kelamin"}
-                    Label={"Jenis kelamin *"}
-                    Items={[
-                      {
-                        value: "Laki-laki",
-                        label: "Laki-laki",
-                      },
-                      {
-                        value: "Perempuan",
-                        label: "Perempuan",
-                      },
-                    ]}
-                  />
-                </Col>
-              </GridItems>
-              <GridItems>
-                <Col>
-                  <InputFoto Src={""} Name={"foto"} Label={"Foto"} />
-                </Col>
-              </GridItems>
-              <GridItems>
-                <Col>
-                  <TextArea Name={"alamat"} Label={"Alamat *"} />
-                </Col>
-              </GridItems>
-              <BtnModal>
-                <MDButton
-                  HandleClick={() => {
-                    navigate(-1);
-                  }}
-                  variant="gradient"
-                  color="error"
-                >
-                  Kembali
-                </MDButton>
-                <MDButton
-                  HandleClick={handleSubmit}
-                  variant="gradient"
-                  color="info"
-                  sx={{ marginLeft: "20px" }}
-                >
-                  Submit
-                </MDButton>
-              </BtnModal>
-            </GridParent>
-          </form>
         </CardParent>
         <Footer />
       </DashboardLayout>

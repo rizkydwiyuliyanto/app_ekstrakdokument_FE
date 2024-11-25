@@ -52,6 +52,8 @@ import Dashboardprodi from "layouts/dashboard_prodi";
 import MataKuliah from "layouts/prodi/mata_kuliah";
 import TambahMataKuliah from "layouts/prodi/mata_kuliah/tambah";
 import PrivateRoute from "components/PrivateRoute";
+// Mahasiswa
+import Transkrip from "layouts/mahasiswa/transkrip";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -233,6 +235,38 @@ let prodi = [
     ),
   },
 ];
-const privateRoutes = [...admin, ...prodi];
+let mahasiswa = [
+  {
+    role: "mahasiswa",
+    type: "collapse",
+    name: "Dashboard",
+    key: "dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/dashboard",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <Dashboardprodi />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+  {
+    role: "mahasiswa",
+    type: "collapse",
+    name: "Transkrip",
+    key: "transkrip",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "/transkrip",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <Transkrip />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+];
+const privateRoutes = [...admin, ...prodi, ...mahasiswa];
 
 export default privateRoutes;

@@ -14,8 +14,8 @@ Coded by www.creative-tim.com
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
-import { useEffect, useRef, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useContext, useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
 // @mui material components
 import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
@@ -38,11 +38,11 @@ import ProfilesList from "examples/Lists/ProfilesList";
 import DefaultProjectCard from "examples/Cards/ProjectCards/DefaultProjectCard";
 
 // Overview page components
-import Header from "layouts/master/detail_mahasiswa/components/Header";
-import PlatformSettings from "layouts/master/detail_mahasiswa/components/PlatformSettings";
+import Header from "layouts/mahasiswa/transkrip/components/Header";
+import PlatformSettings from "layouts/mahasiswa/transkrip/components/PlatformSettings";
 
 // Data
-import profilesListData from "layouts/master/detail_mahasiswa/data/profilesListData";
+import profilesListData from "layouts/mahasiswa/transkrip/data/profilesListData";
 // Images
 import { styled } from "@mui/material/styles";
 import { getData } from "request/request";
@@ -55,10 +55,10 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import MDButton from "components/MDButton";
 import FileUpload from "./FileUpload";
-import { Stack, Typography, Box } from "@mui/material";
-import LogoUSTJ from "assets/images/logo-ustj.png";
 import GeneratePDF from "components/GeneratePDF";
-
+import { Box, Stack, Typography } from "@mui/material";
+import { Content } from "context/user-context";
+import LogoUSTJ from "assets/images/logo-ustj.png";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -118,7 +118,10 @@ const PilihTanggal = (props) => {
     </>
   )
 }
-const DataMahasiswa = ({ user }) => {
+
+const DataMahasiswa = () => {
+  const { user, setUser } = useContext(Content);
+
   return (
     <>
       <Box sx={{ marginBottom: "16.5px", display: "flex", justifyContent: "space-between", width: "70%" }}>
@@ -174,7 +177,7 @@ const TandaTangan = () => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            height: "120px"
+            height: "100px"
           }}>
             <Box>
               <Typography sx={{ textAlign: 'center', fontSize: "14px", lineHeight: "1" }} variant={"body2"}>
@@ -183,10 +186,10 @@ const TandaTangan = () => {
             </Box>
             <Box>
               <Typography variant={"body2"} sx={{ fontSize: "14px", textAlign: 'center', fontWeight: "700", textDecoration: "underline", lineHeight: "1" }}>
-                {/* Dosen */}RIZKIAL ACHMAD, S.Kom.,M.T
+                {/* Dosen */}_____
               </Typography>
               <Typography variant={"body2"} sx={{ fontSize: "14px", textAlign: 'center', fontWeight: "700" }}>
-                {/* Lektor */}Lektor
+                {/* Lektor */}
               </Typography>
             </Box>
           </Box>
@@ -201,7 +204,7 @@ const TandaTangan = () => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            height: "120px"
+            height: "100px"
           }}>
             <Box>
               <Typography sx={{ textAlign: 'center', fontSize: "14px", lineHeight: "1" }} variant={"body2"}>
@@ -210,10 +213,10 @@ const TandaTangan = () => {
             </Box>
             <Box>
               <Typography variant={"body2"} sx={{ fontSize: "14px", textAlign: 'center', fontWeight: "700", textDecoration: "underline", lineHeight: "1" }}>
-                {/* Dosen */}EVANITA VERONICA MANULLANG. S.T.,M.T
+                {/* Dosen */}_____
               </Typography>
               <Typography variant={"body2"} sx={{ fontSize: "14px", textAlign: 'center', fontWeight: "700" }}>
-                {/* Lektor */}Lektor
+                {/* Lektor */}
               </Typography>
             </Box>
           </Box>
@@ -228,7 +231,7 @@ const HeaderKemajuanStudi = () => {
     <>
       <Box
         sx={{
-          marginBottom: "4px",
+          marginBottom: "14px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -246,11 +249,39 @@ const HeaderKemajuanStudi = () => {
     </>
   )
 }
+
 // eslint-disable-next-line react/prop-types
 const MataKuliah = ({ Id, SetLinkDownload }) => {
   const [data, setData] = useState([]);
+  const [tanggalKHS, setTanggalKHS] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("");
   const [nilaiKHS, setNilaiKHS] = useState([]);
   const [loading, setLoading] = useState(true);
+  const matKulRef = useRef("");
+  const getKHS = async ({ id_khs }) => {
+    try {
+      const nilaiKHS = await getData({ link: `mahasiswa/get_nilai_khs/${id_khs}` });
+      setNilaiKHS(nilaiKHS.data);
+      // console.log(nilaiKHS)
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  const getTanggalKHS = () => {
+    getData({ link: `mahasiswa/get_khs/${Id}` })
+      .then((res) => {
+        const { data } = res;
+        setTanggalKHS(data);
+        if (data.length > 0) {
+          setSelectedDate(data[0].id_khs);
+          getKHS({ id_khs: data[0].id_khs });
+        }
+        // console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
   const getMataKuliah = () => {
     getData({ link: "mata_kuliah/get_data" })
       .then((res) => {
@@ -263,51 +294,32 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
       });
   };
 
-  const setNilaiKemajuanStudi = async () => {
-    try {
-      console.log("TESTtest");
-      const { data } = await getData({ link: `mahasiswa/nilai_dns?npm=${Id}` });
-      // console.log(data);
-      setNilaiKHS(data);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
   const showNilai = (id_matkul) => {
     const x = ["A", "B", "C"]
     let result = "-";
-    const matKul = nilaiKHS.filter(x => {
+    const matKul = nilaiKHS.find(x => {
       return x.id_mata_kuliah === id_matkul
     });
-    console.log(id_matkul);
-    console.log(matKul);
     // console.log(matKul);
-    if (matKul.length > 0) {
-      if (x.includes(matKul[0]?.nilai_akhir)) {
-        result = matKul[0]?.nilai_akhir;
+    if (matKul) {
+      if (x.includes(matKul?.nilai)) {
+        result = matKul?.nilai;
       }
     }
     return result
   }
+
   useEffect(() => {
+    getTanggalKHS();
     getMataKuliah();
-    setNilaiKemajuanStudi();
   }, []);
+  useEffect(() => {
+    if (tanggalKHS.length > 0) getKHS({ id_khs: selectedDate });
+  }, [selectedDate])
   const semester = [1, 2, 3, 4, 5, 6, 7, 8];
   return (
     <>
-      {/* {tanggalKHS.length > 0
-          &&
-          <Grid item md={12} sx={{ padding: "0em 0.5em" }}>
-            <PilihTanggal
-              TanggalKHS={tanggalKHS}
-              SetSelectedDate={setSelectedDate}
-              SelectedDate={selectedDate}
-            />
-          </Grid>
-        } */}
-      <Grid container columnSpacing={2} rowSpacing={1}>
+      <Grid container columnSpacing={4} rowSpacing={2}>
         {semester.map((x) => {
           const matKul = data.filter((y) => {
             return y.semester == x;
@@ -337,7 +349,7 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
                               <StyledTableCell>{item?.mata_kuliah}</StyledTableCell>
                               <StyledTableCell align={"center"}>{item?.sks}</StyledTableCell>
                               <StyledTableCell align={"center"}>{item?.semester}</StyledTableCell>
-                              <StyledTableCell align={"center"}>{nilaiKHS.length > 0 ? showNilai(item?.id_mata_kuliah) : "-"}</StyledTableCell>
+                              <StyledTableCell align={"center"}>{tanggalKHS.length === 0 ? "-" : showNilai(item?.id_mata_kuliah)}</StyledTableCell>
                             </StyledTableRow>
                           </>
                         );
@@ -358,12 +370,13 @@ function Overview() {
   const [selected, setSelected] = useState({});
   const [loading, setLoading] = useState(true);
   const [tabValue, setTabValue] = useState(0);
-  const [linkDownload, setLinkDownload] = useState("");
   const [open, setOpen] = useState(false);
-  const { userId } = useParams();
+  const { user, setUser } = useContext(Content);
+
   const matKulRef = useRef("");
+
   const getSelected = () => {
-    getData({ link: `mahasiswa/get_selected_data/${userId}` })
+    getData({ link: `mahasiswa/get_selected_data/${user.npm}` })
       .then((res) => {
         const { data } = res;
         setSelected(data[0]);
@@ -378,7 +391,6 @@ function Overview() {
         Hi, I’m ${selected?.nama_depan} ${selected?.nama_belakang}, Decisions: If you can’t decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality).
       `;
   };
-
   useEffect(() => {
     getSelected();
   }, []);
@@ -394,7 +406,7 @@ function Overview() {
       >
         <MDBox mt={5} mb={3}>
           {/* Form input PDF */}
-          <FileUpload Open={open} SetOpen={setOpen} Id={userId} />
+          <FileUpload Open={open} SetOpen={setOpen} Id={user.npm} />
           <Grid container spacing={1}>
             {tabValue === 0 && (
               <>
@@ -427,7 +439,7 @@ function Overview() {
                       },
                     ]}
                     action={{
-                      route: `/master/detail_mahasiswa/edit/${selected.npm}`,
+                      route: `/master/transkrip/edit/${selected.npm}`,
                       tooltip: "Edit Profile",
                     }}
                     shadow={false}
@@ -450,33 +462,29 @@ function Overview() {
         </MDBox>
         <MDBox pt={2} px={2} lineHeight={1.25}>
           <MDTypography variant="h6" fontWeight="medium">
-            Kemajuan Studi
+            Nilai
           </MDTypography>
           <MDBox mb={1}>
             <Stack sx={{ marginTop: "10px" }} direction={"row"} spacing={2}>
-              <MDBox mb={1}>
-                <Stack direction={"row"} spacing={2}>
-                  <MDButton
-                    variant="gradient"
-                    color="primary"
-                    HandleClick={() => {
-                      console.log("ETE")
-                      setOpen(true);
-                    }}
-                  >
-                    Upload DNS
-                  </MDButton>
-                  <GeneratePDF Ref={matKulRef} />
-                </Stack>
-              </MDBox>
+              <MDButton
+                variant="gradient"
+                color="primary"
+                HandleClick={() => {
+                  console.log("ETE")
+                  setOpen(true);
+                }}
+              >
+                Update Nilai
+              </MDButton>
+              <GeneratePDF Ref={matKulRef} />
             </Stack>
           </MDBox>
         </MDBox>
         <MDBox p={2}>
           <div ref={matKulRef}>
             <HeaderKemajuanStudi />
-            {Object.keys(selected).length > 0 && <DataMahasiswa user={selected} />}
-            <MataKuliah Id={userId} SetLinkDownload={setLinkDownload} />
+            <DataMahasiswa />
+            <MataKuliah Id={user.npm} />
             <TandaTangan />
           </div>
         </MDBox>
