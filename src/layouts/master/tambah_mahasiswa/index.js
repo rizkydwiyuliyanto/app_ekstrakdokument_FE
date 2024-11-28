@@ -111,6 +111,11 @@ const CSVData = ({ data, setData }) => {
               </Col>
               <Col sm={"2"}>
                 <Typography variant={"h6"} align={"center"}>
+                  Password
+                </Typography>
+              </Col>
+              <Col sm={"2"}>
+                <Typography variant={"h6"} align={"center"}>
                   No.HP
                 </Typography>
               </Col>
@@ -185,6 +190,13 @@ const CSVData = ({ data, setData }) => {
                       <TextField
                         name={"nama_belakang"}
                         defaultValue={x["nama_belakang"]}
+                        fullWidth
+                      />
+                    </Col>
+                    <Col sm={"2"}>
+                      <TextField
+                        name={"password"}
+                        defaultValue={x["password"] || "123"}
                         fullWidth
                       />
                     </Col>

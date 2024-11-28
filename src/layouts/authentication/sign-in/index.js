@@ -75,7 +75,8 @@ function Basic() {
         }
       })
       .catch((err) => {
-        console.log(err);
+        alert(err);
+        // console.log(err);
       });
   };
   if (user?.role) {
