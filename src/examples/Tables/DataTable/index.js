@@ -434,7 +434,14 @@ function DataTable({
                 <Icon sx={{ fontWeight: "bold" }}>chevron_left</Icon>
               </MDPagination>
             )} */}
-            {renderPagination.length > 6 ? (
+            <MDBox width="5rem" mx={1}>
+              <MDInput
+                inputProps={{ type: "number", min: 1, max: customizedPageOptions.length }}
+                value={customizedPageOptions[pageIndex]}
+                onChange={(handleInputPagination, handleInputPaginationValue)}
+              />
+            </MDBox>
+            {/* {renderPagination.length > 6 ? (
               <MDBox width="5rem" mx={1}>
                 <MDInput
                   inputProps={{ type: "number", min: 1, max: customizedPageOptions.length }}
@@ -444,7 +451,7 @@ function DataTable({
               </MDBox>
             ) : (
               renderPagination
-            )}
+            )} */}
             {/* {canNextPage && (
               <MDPagination item onClick={() => nextPage()}>
                 <Icon sx={{ fontWeight: "bold" }}>chevron_right</Icon>
