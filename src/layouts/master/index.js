@@ -44,7 +44,7 @@ function Tables() {
         Header: "mahasiswa",
         accessor: "mahasiswa",
         name: "mahasiswa",
-        width: "40%",
+        width: "20%",
         align: "left",
       },
       { Header: "npm", accessor: "npm", name: "npm", align: "left" },
@@ -54,6 +54,7 @@ function Tables() {
     ],
     link: "mahasiswa/get_data",
     SetID: setId,
+    primaryKey: "npm",
   });
 
   const { dataDosen, loading_dsn, reload_dsn } = tableDosen({
@@ -66,6 +67,7 @@ function Tables() {
     ],
     link: "dosen/get_data",
     SetID: setId,
+    primaryKey: "nidn",
   });
 
   return (
@@ -85,8 +87,13 @@ function Tables() {
               </Container>
             ) : (
               <DataTable
-                table={{ columns: dataDosen["columns"], rows: dataDosen["rows"] }}
+                table={{
+                  columns: dataDosen["columns"],
+                  rows: dataDosen["rows"],
+                  ids: dataDosen["id"],
+                }}
                 isSorted={false}
+                DeleteLink={"dosen/delete_dsn"}
                 entriesPerPage={false}
                 showTotalEntries={false}
                 ReloadData={reload_dsn}
@@ -106,8 +113,13 @@ function Tables() {
               </Container>
             ) : (
               <DataTable
-                table={{ columns: dataMahasiswa["columns"], rows: dataMahasiswa["rows"] }}
+                table={{
+                  columns: dataMahasiswa["columns"],
+                  rows: dataMahasiswa["rows"],
+                  ids: dataMahasiswa["id"],
+                }}
                 isSorted={false}
+                DeleteLink={"mahasiswa/delete_mhs"}
                 entriesPerPage={false}
                 showTotalEntries={false}
                 ReloadData={reload_mhs}

@@ -95,6 +95,15 @@ const inputFoto = async ({ link, formData }) => {
   }
 };
 
+const remove = async ({ link }) => {
+  try {
+    const result = await instance.delete(link);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 const getData = async ({ link }) => {
   try {
     const result = await instance.get(link);
@@ -113,4 +122,5 @@ export {
   edit,
   readCSV,
   signIn,
+  remove
 };

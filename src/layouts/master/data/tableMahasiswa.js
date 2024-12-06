@@ -32,10 +32,11 @@ import TextRow from "components/TextRow";
 import { getData } from "request/request";
 import { useLocation, NavLink } from "react-router-dom";
 
-export default function data({ header, link }) {
+export default function data({ header, link, primaryKey }) {
   const [fetch, setFetch] = useState({
     columns: header,
     rows: [],
+    id: [],
   });
 
   const [loading, setLoading] = useState(true);
@@ -61,6 +62,9 @@ export default function data({ header, link }) {
         console.log(res);
         setFetch({
           ...fetch,
+          id: res.data.map((x) => {
+            return x[primaryKey];
+          }),
           rows: res.data.map((x, idx) => {
             let avatar;
             if (x.foto) {
@@ -117,6 +121,7 @@ export default function data({ header, link }) {
   return {
     dataMahasiswa: fetch,
     loading_mhs: loading,
+
     reload_mhs: (obj) => {
       // setLoading(true);
       fetchRows(obj);

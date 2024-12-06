@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
 =========================================================
 * Material Dashboard 2 React - v2.2.0
@@ -27,6 +28,7 @@ import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import Icon from "@mui/material/Icon";
+import Checkbox from "@mui/material/Checkbox";
 import Autocomplete from "@mui/material/Autocomplete";
 
 // Material Dashboard 2 React components
@@ -38,8 +40,18 @@ import MDPagination from "components/MDPagination";
 // Material Dashboard 2 React example components
 import DataTableHeadCell from "examples/Tables/DataTable/DataTableHeadCell";
 import DataTableBodyCell from "examples/Tables/DataTable/DataTableBodyCell";
-import { Button, FormControl, TextField } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  IconButton,
+  Stack,
+  TableCell,
+  TextField,
+  Typography,
+} from "@mui/material";
 
+import DeleteIcon from "@mui/icons-material/Delete";
+import { remove } from "request/request";
 const InputFilter = ({ ...rest }) => {
   return (
     <FormControl>
@@ -57,6 +69,7 @@ function DataTable({
   isSorted,
   ReloadData,
   noEndBorder,
+  DeleteLink,
 }) {
   const defaultValue = entriesPerPage.defaultValue ? entriesPerPage.defaultValue : 10;
   const entries = entriesPerPage.entries
@@ -64,7 +77,7 @@ function DataTable({
     : ["5", "10", "15", "20", "25"];
   const columns = useMemo(() => table.columns, [table]);
   const data = useMemo(() => table.rows, [table]);
-
+  const [selected, setSelected] = useState([]);
   const tableInstance = useTable(
     { columns, data, initialState: { pageIndex: 0 } },
     useGlobalFilter,
@@ -165,6 +178,33 @@ function DataTable({
     });
   };
   const notColumnFilter = ["action"];
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      const newSelected = page.map((n, idx) => idx);
+      setSelected(newSelected);
+      return;
+    }
+    setSelected([]);
+  };
+  const handleSelected = (event, id) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+    setSelected(newSelected);
+  };
+  const rowCount = page.length;
   useEffect(() => {
     let obj = {};
     columns
@@ -179,6 +219,37 @@ function DataTable({
       });
     setFormFilter(obj);
   }, []);
+  const handleDelete = () => {
+    let idx = 0;
+    let id = table?.ids[selected[idx]];
+    let link = `${DeleteLink}/${id}`;
+    const deleteData = (link) => {
+      remove({ link: link })
+        .then((res) => {
+          idx += 1;
+          if (idx <= selected.length) {
+            id = table?.ids[selected[idx]];
+            let link = `${DeleteLink}/${id}`;
+            setTimeout(() => {
+              deleteData(link);
+            }, 250);
+          } else {
+            ReloadData(formFilter);
+            return;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+    deleteData(link);
+  };
+  useEffect(() => {
+    // if (selected.length > 0) {
+    //   const filtered = selected.f
+    // }
+    setSelected([]);
+  }, [page]);
   return (
     <TableContainer sx={{ boxShadow: "none" }}>
       {entriesPerPage || canSearch ? (
@@ -220,6 +291,20 @@ function DataTable({
       <Table {...getTableProps()}>
         <MDBox component="thead">
           <TableRow>
+            <TableCell>
+              {selected.length > 0 && (
+                <>
+                  <Stack justifyContent={"body"} alignItems={"center"}>
+                    <Typography color="inherit" variant="caption">
+                      ({selected.length})
+                    </Typography>
+                    <IconButton onClick={handleDelete}>
+                      <DeleteIcon fontSize={"7"} />
+                    </IconButton>
+                  </Stack>
+                </>
+              )}
+            </TableCell>
             {columns
               .filter((y) => {
                 return !notColumnFilter.includes(y?.Header);
@@ -251,6 +336,17 @@ function DataTable({
         <MDBox component="thead">
           {headerGroups.map((headerGroup, key) => (
             <TableRow key={key} {...headerGroup.getHeaderGroupProps()}>
+              <TableCell width={"5%"}>
+                <Checkbox
+                  color="primary"
+                  indeterminate={selected.length > 0 && selected.length < rowCount}
+                  checked={rowCount > 0 && selected.length === rowCount}
+                  onChange={handleSelectAllClick}
+                  inputProps={{
+                    "aria-label": "select all desserts",
+                  }}
+                />
+              </TableCell>
               {headerGroup.headers.map((column, idx) => (
                 <DataTableHeadCell
                   key={idx}
@@ -268,20 +364,42 @@ function DataTable({
         <TableBody {...getTableBodyProps()}>
           {page.map((row, key) => {
             prepareRow(row);
+            const isItemSelected = selected.includes(key);
             return (
-              <TableRow key={key} {...row.getRowProps()}>
+              <TableRow
+                hover
+                onClick={(event) => handleSelected(event, key)}
+                selected={isItemSelected}
+                sx={{ cursor: "pointer" }}
+                role="checkbox"
+                aria-checked={isItemSelected}
+                tabIndex={-1}
+                key={key}
+                {...row.getRowProps()}
+              >
+                <DataTableBodyCell>
+                  <Checkbox
+                    color="primary"
+                    checked={isItemSelected}
+                    inputProps={{
+                      "aria-label": "select all desserts",
+                    }}
+                  />
+                </DataTableBodyCell>
                 {row.cells.length > 0 ? (
                   <>
-                    {row.cells.map((cell, idx) => (
-                      <DataTableBodyCell
-                        key={idx}
-                        noBorder={noEndBorder && rows.length - 1 === key}
-                        align={cell.column.align ? cell.column.align : "left"}
-                        {...cell.getCellProps()}
-                      >
-                        {cell.render("Cell")}
-                      </DataTableBodyCell>
-                    ))}
+                    {row.cells.map((cell, idx) => {
+                      return (
+                        <DataTableBodyCell
+                          key={idx}
+                          noBorder={noEndBorder && rows.length - 1 === key}
+                          align={cell.column.align ? cell.column.align : "left"}
+                          {...cell.getCellProps()}
+                        >
+                          {cell.render("Cell")}
+                        </DataTableBodyCell>
+                      );
+                    })}
                   </>
                 ) : (
                   <DataTableBodyCell>Data masih Kosong</DataTableBodyCell>

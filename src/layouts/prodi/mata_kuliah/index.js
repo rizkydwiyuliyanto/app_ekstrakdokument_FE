@@ -53,6 +53,7 @@ function Tables() {
     ],
     link: "mata_kuliah/get_data",
     SetID: setId,
+    primaryKey: "id_mata_kuliah",
   });
   return (
     <>
@@ -71,7 +72,8 @@ function Tables() {
               </Container>
             ) : (
               <DataTable
-                table={{ columns: data["columns"], rows: data["rows"] }}
+                table={{ columns: data["columns"], rows: data["rows"], ids: data["id"] }}
+                DeleteLink={"mata_kuliah/delete_matkul"}
                 isSorted={false}
                 entriesPerPage={false}
                 showTotalEntries={false}
