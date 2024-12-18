@@ -58,6 +58,7 @@ import FileUpload from "./FileUpload";
 import { Stack, Typography, Box } from "@mui/material";
 import LogoUSTJ from "assets/images/logo-ustj.png";
 import GeneratePDF from "components/GeneratePDF";
+import MatkulMengulang from "./MatkulMengulang";
 
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -360,6 +361,7 @@ function Overview() {
   const [tabValue, setTabValue] = useState(0);
   const [linkDownload, setLinkDownload] = useState("");
   const [open, setOpen] = useState(false);
+  const [openMatkulMengulang, setOpenMatkulMengulang] = useState(false);
   const { userId } = useParams();
   const matKulRef = useRef("");
   const getSelected = () => {
@@ -449,6 +451,11 @@ function Overview() {
           </Grid>
         </MDBox>
         <MDBox pt={2} px={2} lineHeight={1.25}>
+          <MatkulMengulang
+            open={openMatkulMengulang}
+            handleClose={() => { setOpenMatkulMengulang(false) }}
+            id={selected?.npm}
+          />
           <MDTypography variant="h6" fontWeight="medium">
             Kemajuan Studi
           </MDTypography>
@@ -467,6 +474,15 @@ function Overview() {
                     Upload DNS
                   </MDButton>
                   <GeneratePDF Ref={matKulRef} />
+                  <MDButton
+                    variant="gradient"
+                    color="primary"
+                    HandleClick={() => {
+                      setOpenMatkulMengulang(true);
+                    }}
+                  >
+                    Mata kuliah mengulang
+                  </MDButton>
                 </Stack>
               </MDBox>
             </Stack>

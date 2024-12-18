@@ -95,7 +95,7 @@ const index = () => {
             <form ref={formRef}>
               <GridParent>
                 <GridItems>
-                  <Col md={4} xs={12}>
+                  <Col md={3} xs={12}>
                     {/* https://stackoverflow.com/questions/30792526/defaultvalue-change-does-not-re-render-input */}
                     <MDInput
                       defaultValue={selected?.nama_depan}
@@ -105,7 +105,7 @@ const index = () => {
                       fullWidth
                     />
                   </Col>
-                  <Col md={4} xs={12}>
+                  <Col md={3} xs={12}>
                     <MDInput
                       defaultValue={selected?.nama_belakang}
                       // key={"OKAYG_" + (10000 + Math.random() * (1000000 - 10000))}
@@ -114,12 +114,20 @@ const index = () => {
                       fullWidth
                     />
                   </Col>
-                  <Col md={4} xs={12}>
+                  <Col md={3} xs={12}>
                     <MDInput
                       defaultValue={selected?.npm}
                       // key={"OKAYG_" + (10000 + Math.random() * (1000000 - 10000))}
                       name={"npm"}
                       label="NPM *"
+                    />
+                  </Col>
+                  <Col md={3} xs={12}>
+                    <MDInput
+                      defaultValue={selected?.password}
+                      // key={"OKAYG_" + (10000 + Math.random() * (1000000 - 10000))}
+                      name={"password"}
+                      label="Password *"
                     />
                   </Col>
                 </GridItems>
