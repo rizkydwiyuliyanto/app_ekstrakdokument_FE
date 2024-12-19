@@ -256,6 +256,7 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
   const [tanggalKHS, setTanggalKHS] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [nilaiKHS, setNilaiKHS] = useState([]);
+  const { user } = useContext(Content);
   const [loading, setLoading] = useState(true);
   const matKulRef = useRef("");
   const getKHS = async ({ id_khs }) => {
@@ -283,7 +284,7 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
       });
   }
   const getMataKuliah = () => {
-    getData({ link: "mata_kuliah/get_data" })
+    getData({ link: "mata_kuliah/get_data/"+user?.id_jurusan })
       .then((res) => {
         const { data } = res;
         setData(data);
@@ -319,6 +320,7 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
   const semester = [1, 2, 3, 4, 5, 6, 7, 8];
   return (
     <>
+      {/* <pre>{JSON.stringify(user, null, 2)}</pre> */}
       <Grid container columnSpacing={4} rowSpacing={2}>
         {semester.map((x) => {
           const matKul = data.filter((y) => {
