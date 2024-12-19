@@ -14,7 +14,7 @@ Coded by www.creative-tim.com
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -59,6 +59,7 @@ import { Stack, Typography, Box } from "@mui/material";
 import LogoUSTJ from "assets/images/logo-ustj.png";
 import GeneratePDF from "components/GeneratePDF";
 import MatkulMengulang from "./MatkulMengulang";
+import { Content } from "context/user-context";
 
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -250,10 +251,11 @@ const HeaderKemajuanStudi = () => {
 // eslint-disable-next-line react/prop-types
 const MataKuliah = ({ Id, SetLinkDownload }) => {
   const [data, setData] = useState([]);
+  const { user } = useContext(Content);
   const [nilaiKHS, setNilaiKHS] = useState([]);
   const [loading, setLoading] = useState(true);
   const getMataKuliah = () => {
-    getData({ link: "mata_kuliah/get_data" })
+    getData({ link: "mata_kuliah/get_data/" + user?.id_jurusan })
       .then((res) => {
         const { data } = res;
         setData(data);
