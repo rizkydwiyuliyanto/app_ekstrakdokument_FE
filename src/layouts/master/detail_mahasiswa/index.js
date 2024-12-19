@@ -281,8 +281,6 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
     const matKul = nilaiKHS.filter(x => {
       return x.id_mata_kuliah === id_matkul
     });
-    console.log(id_matkul);
-    console.log(matKul);
     // console.log(matKul);
     if (matKul.length > 0) {
       if (x.includes(matKul[0]?.nilai_akhir)) {

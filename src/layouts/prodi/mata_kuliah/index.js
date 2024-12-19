@@ -13,7 +13,7 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 // @mui material components
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -34,8 +34,10 @@ import CardParent from "components/CardParent";
 import ButtonLinkCard from "components/ButtonCardLink";
 import Link from "@mui/material/Link";
 import { Container, Typography } from "@mui/material";
+import { Content } from "context/user-context";
 function Tables() {
   const [id, setId] = useState("");
+  const { user, setUser } = useContext(Content);
   const { data, loading, reload } = table({
     header: [
       {
@@ -51,7 +53,7 @@ function Tables() {
       // { Header: "employed", accessor: "employed", align: "center" },
       { Header: "action", accessor: "action", align: "center" },
     ],
-    link: "mata_kuliah/get_data",
+    link: "mata_kuliah/get_data/" + user?.id_jurusan,
     SetID: setId,
     primaryKey: "id_mata_kuliah",
   });

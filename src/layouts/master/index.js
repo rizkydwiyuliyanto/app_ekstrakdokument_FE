@@ -30,14 +30,17 @@ import DataTable from "examples/Tables/DataTable";
 // Data
 import tableMahasiswa from "layouts/master/data/tableMahasiswa";
 import tableDosen from "layouts/master/data/tableDosen";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import MDButton from "components/MDButton";
-import { Container, Typography } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import CardParent from "components/CardParent";
 import ButtonLinkCard from "components/ButtonCardLink";
 import Link from "@mui/material/Link";
+import { Content } from "context/user-context";
 function Tables() {
   const [id, setId] = useState("");
+  const { user, setUser } = useContext(Content);
+
   const { dataMahasiswa, loading_mhs, reload_mhs } = tableMahasiswa({
     header: [
       {
@@ -52,7 +55,7 @@ function Tables() {
       // { Header: "employed", accessor: "employed", align: "center" },
       { Header: "action", accessor: "action", align: "center" },
     ],
-    link: "mahasiswa/get_data",
+    link: "mahasiswa/get_data/" + user?.id_jurusan,
     SetID: setId,
     primaryKey: "npm",
   });
@@ -65,11 +68,10 @@ function Tables() {
       // { Header: "employed", accessor: "employed", align: "center" },
       { Header: "action", accessor: "action", align: "center" },
     ],
-    link: "dosen/get_data",
+    link: "dosen/get_data/" + user?.id_jurusan,
     SetID: setId,
     primaryKey: "nidn",
   });
-
   return (
     <>
       <DashboardLayout>

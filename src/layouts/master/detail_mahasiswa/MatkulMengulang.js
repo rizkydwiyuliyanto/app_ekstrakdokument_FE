@@ -10,7 +10,7 @@ import { getData } from "request/request";
 const MatkulMengulang = ({ open, handleClose, id }) => {
   const [data, setData] = useState([]);
   useEffect(() => {
-    getData({ link: `mahasiswa/matkul_mengulang/${id}` })
+    getData({ link: `mahasiswa/matkul_mengulang2/${id}` })
       .then((res) => {
         const { data } = res;
         setData(data);
@@ -31,11 +31,26 @@ const MatkulMengulang = ({ open, handleClose, id }) => {
       width: "450px",
     },
     {
+      id: "periode",
+      label: "Periode",
+      width: "450px",
+    },
+    {
       id: "nilai_akhir",
       label: "Nilai akhir",
       width: "100px",
     },
   ];
+  function compare(a, b) {
+    if (a.periode < b.periode) {
+      return -1;
+    }
+    if (a.periode > b.periode) {
+      return 1;
+    }
+    return 0;
+  }
+
   return (
     <Dialog
       open={open}
@@ -51,47 +66,22 @@ const MatkulMengulang = ({ open, handleClose, id }) => {
             <>
               <Stack direction={"column"} rowGap={3.25} sx={{ padding: "12px" }}>
                 {data.map((x, idx) => {
-                  const { matkul, tahun, jml_sks, jml_dcp } = x;
                   return (
                     <Stack key={`${idx}`} direction={"column"} rowGap={1}>
-                      <Stack
-                        sx={{ borderBottom: "1.25px solid #dddddd", padding: "4px 0" }}
-                        direction={"column"}
-                        rowGap={0.25}
-                      >
-                        <Stack direction={"row"} columnGap={2.25} justifyContent={"start"}>
-                          <Typography variant={"body2"} sx={{ width: "100px" }}>
-                            Tahun ajaran
-                          </Typography>
-                          <Typography variant={"body2"}>: {tahun}</Typography>
-                        </Stack>
-                        <Stack direction={"row"} columnGap={2.25} justifyContent={"start"}>
-                          <Typography variant={"body2"} sx={{ width: "100px" }}>
-                            Jumlah SKS
-                          </Typography>
-                          <Typography variant={"body2"}>: {jml_sks}</Typography>
-                        </Stack>
-                        <Stack direction={"row"} columnGap={2.25} justifyContent={"start"}>
-                          <Typography variant={"body2"} sx={{ width: "100px" }}>
-                            Jumlah DCP
-                          </Typography>
-                          <Typography variant={"body2"}>: {jml_dcp}</Typography>
-                        </Stack>
-                      </Stack>
                       <table aria-label="simple table">
                         <thead>
                           <tr>
-                            {columns.map((x, idx) => {
+                            {columns.map((itemColumn, idx) => {
                               return (
                                 <td style={{ padding: "7px 0" }} key={idx}>
-                                  {x?.label}
+                                  {itemColumn?.label}
                                 </td>
                               );
                             })}
                           </tr>
                         </thead>
                         <tbody>
-                          {matkul.map((item) => {
+                          {x?.sort(compare)?.map((item) => {
                             return (
                               <>
                                 <tr>
