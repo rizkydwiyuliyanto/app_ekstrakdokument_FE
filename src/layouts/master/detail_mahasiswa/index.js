@@ -121,18 +121,32 @@ const PilihTanggal = (props) => {
   )
 }
 const DataMahasiswa = ({ user }) => {
+  const tanggalLahir = (date) => {
+    const a = new Date(date);
+    const month = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+    return `${a?.getDate()} ${month[a.getMonth()]}, ${a.getFullYear()}`
+  }
   return (
     <>
+      <Typography variant={"body2"} align={"center"} sx={{ fontSize: 15, lineHeight: 1.10, marginBottom: "7px" }}>
+        Kemajuan studi
+      </Typography>
       <Box sx={{ marginBottom: "16.5px", display: "flex", justifyContent: "space-between", width: "70%" }}>
         <Box>
-          <Typography variant={"h6"} sx={{ fontSize: 12.5, lineHeight: 1.10 }}>
-            Kemajuan studi
-          </Typography>
-          <Box>
-            <Typography variant={"body1"} sx={{ lineHeight: "2", fontSize: 12, color: "black", fontWight: "700" }}>Nama: {user?.nama_depan + " " + user?.nama_belakang}, NPM: {user?.npm}</Typography>
-            {/* <Typography variant={"body1"} sx={{ lineHeight: "2", fontSize: 12, color: "black", fontWight: "700" }}>Nama: {user?.nama_depan + " " + user?.nama_belakang}</Typography>
-            <Typography variant={"body1"} sx={{ lineHeight: "2", fontSize: 12, color: "black", fontWight: "700" }}>No. HP: {user?.no_hp}</Typography> */}
-          </Box>
+          <Stack direction={"column"} rowGap={0.5} sx={{ width: "100%", marginTop: "12px" }}>
+            <Stack sx={{ width: "320px" }} direction={"row"} justifyContent={"space-between"}>
+              <Typography variant={"caption"} sx={{ fontWeight: 600 }}>Nama mahasiswa</Typography>
+              <Typography variant={"caption"} sx={{ fontWeight: 600, width: "190px" }}>: {user?.nama_depan + " " + user?.nama_belakang}</Typography>
+            </Stack>
+            <Stack sx={{ width: "320px" }} direction={"row"} justifyContent={"space-between"}>
+              <Typography variant={"caption"} sx={{ fontWeight: 600 }}>NPM</Typography>
+              <Typography variant={"caption"} sx={{ fontWeight: 600, width: "190px" }}>: {user?.npm}</Typography>
+            </Stack>
+            <Stack sx={{ width: "320px" }} direction={"row"} justifyContent={"space-between"}>
+              <Typography variant={"caption"} sx={{ fontWeight: 600 }}>Tanggal lahir</Typography>
+              <Typography variant={"caption"} sx={{ fontWeight: 600, width: "190px" }}>: {tanggalLahir(user?.tanggal_lahir)}</Typography>
+            </Stack>
+          </Stack>
 
         </Box>
         {/* <Box>
@@ -151,7 +165,7 @@ const TandaTangan = () => {
   }
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", width: "80%", }}>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", width: "80%", marginTop: "22px" }}>
         <Typography sx={{
           fontSize: "14px"
         }}
@@ -233,11 +247,17 @@ const HeaderKemajuanStudi = () => {
           marginBottom: "4px",
           display: "flex",
           alignItems: "center",
+          position: "relative",
           justifyContent: "center",
           "height": "100px",
           "width": "100%"
         }}>
-        <Box sx={{ marginRight: "10px" }}>
+        <Box sx={{
+          position: "absolute",
+          left: "0",
+          top: "50%",
+          transform: "translate(0, -50%)"
+        }}>
           <img src={LogoUSTJ} width={"75px"} height={"75px"} alt={"logo"} />
         </Box>
         <Box>
@@ -253,6 +273,7 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
   const [data, setData] = useState([]);
   const { user } = useContext(Content);
   const [nilaiKHS, setNilaiKHS] = useState([]);
+  const [dns, setDNS] = useState({})
   const [loading, setLoading] = useState(true);
   const getMataKuliah = () => {
     getData({ link: "mata_kuliah/get_data/" + user?.id_jurusan })
@@ -266,11 +287,23 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
       });
   };
 
+  const getDNS = () => {
+    getData({ link: "dns/mahasiswa/" + Id })
+      .then((res) => {
+        const { data } = res;
+        setDNS(data[0])
+        console.log(data)
+        // console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   const setNilaiKemajuanStudi = async () => {
     try {
-      console.log("TESTtest");
       const { data } = await getData({ link: `mahasiswa/nilai_dns?npm=${Id}` });
-      // console.log(data);
+      console.log(data);
       setNilaiKHS(data);
     } catch (err) {
       console.log(err);
@@ -278,7 +311,7 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
   }
 
   const showNilai = (id_matkul) => {
-    const x = ["A", "B", "C"]
+    const x = ["A", "B", "C", "D", "E"]
     let result = "-";
     const matKul = nilaiKHS.filter(x => {
       return x.id_mata_kuliah === id_matkul
@@ -294,6 +327,7 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
   useEffect(() => {
     getMataKuliah();
     setNilaiKemajuanStudi();
+    getDNS();
   }, []);
   const semester = [1, 2, 3, 4, 5, 6, 7, 8];
   return (
@@ -315,8 +349,8 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
           });
           return (
             <>
-              <Grid item md={6} sx={{ padding: "1em 0.5em", overflowX: "scroll", overflowY: "hidden" }}>
-                <TableContainer d sx={{ width: "100%" }} component={Paper}>
+              <Grid item md={6} sx={{ padding: "1em 0em", overflowX: "scroll", overflowY: "hidden" }}>
+                <TableContainer sx={{ width: "100%", padding: "0" }} component={Paper}>
                   <Table size={"small"}>
                     <TableBody>
                       <TableRow>
@@ -350,6 +384,26 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
             </>
           );
         })}
+        <Grid item>
+          <Stack>
+            <Typography variant="body2" style={{ marginBottom: "4px" }}>Komulatif</Typography>
+          </Stack>
+          <Stack direction={"column"} rowGap={1.5} sx={{ width: "100%" }}>
+            <Stack direction={"row"} sx={{ width: "200px" }} justifyContent={"space-between"} columnGap={1.5}>
+              <Typography variant={"caption"}>Jumlah DCP</Typography>
+              <Typography variant={"caption"} sx={{ width: "60px", fontWeight: "600" }} >: {dns?.jml_dcp_komulatif}</Typography>
+            </Stack>
+            <Stack direction={"row"} sx={{ width: "200px" }} justifyContent={"space-between"} columnGap={1.5}>
+              <Typography variant={"caption"}>Nilai SKS</Typography>
+              <Typography variant={"caption"} sx={{ width: "60px", fontWeight: "600" }} >: {dns?.ni_sks_komulatif}</Typography>
+            </Stack>
+            <Stack direction={"row"} sx={{ width: "200px" }} justifyContent={"space-between"} columnGap={1.5}>
+              <Typography variant={"caption"}>Nilai IPK</Typography>
+              <Typography variant={"caption"} sx={{ width: "60px", fontWeight: "600" }} >: {dns?.ni_ipk}</Typography>
+            </Stack>
+          </Stack>
+        </Grid>
+        {/* <pre>{JSON.stringify(dns, null, 2)}</pre> */}
       </Grid>
     </>
   );

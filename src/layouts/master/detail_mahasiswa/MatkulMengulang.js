@@ -5,7 +5,10 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 import { getData } from "request/request";
+import MDButton from "components/MDButton";
+
 // eslint-disable-next-line react/prop-types
 const MatkulMengulang = ({ open, handleClose, id }) => {
   const [data, setData] = useState([]);
@@ -59,7 +62,11 @@ const MatkulMengulang = ({ open, handleClose, id }) => {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">{"Mata kuliah mengulang"}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">
+        <Stack direction={"row"} alignItems={"center"} columnGap={2}>
+          <h6>Mata kuliah mengulang</h6>
+        </Stack>
+      </DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           {data.length > 0 ? (
@@ -114,6 +121,9 @@ const MatkulMengulang = ({ open, handleClose, id }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Kembali</Button>
+        <NavLink to={`/master/matkul_mengulang/${id}`} target={"_blank"}>
+          <MDButton color={"success"}>Download</MDButton>
+        </NavLink>
       </DialogActions>
     </Dialog>
   );

@@ -10,7 +10,7 @@ const index = ({ Ref }) => {
       useCORS: true, // Ensure CORS handling for cross-origin images
     });
     const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
+    const pdf = new jsPDF("p", "mm", [210, 330]);
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 

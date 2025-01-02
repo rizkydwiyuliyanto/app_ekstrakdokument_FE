@@ -54,6 +54,7 @@ import TambahMataKuliah from "layouts/prodi/mata_kuliah/tambah";
 import PrivateRoute from "components/PrivateRoute";
 // Mahasiswa
 import Transkrip from "layouts/mahasiswa/transkrip";
+import Doc_MatkulMengulang from "layouts/document/MahasiswaMengulang";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -157,6 +158,12 @@ let prodi = [
         </Interceptor>
       </PrivateRoute>
     ),
+  },
+  {
+    role: "prodi",
+    type: "sub_menu",
+    route: "/master/matkul_mengulang/:userId",
+    component: <Doc_MatkulMengulang />,
   },
   {
     role: "prodi",
