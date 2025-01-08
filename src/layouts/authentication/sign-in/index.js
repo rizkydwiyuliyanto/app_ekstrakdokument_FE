@@ -39,6 +39,7 @@ import { signIn } from "request/request";
 import { Content } from "context/user-context";
 import { useNavigate, Navigate, useLocation } from "react-router-dom";
 import privateRoutes from "private_routes";
+import { getData } from "request/request";
 
 const changeRoute = (role) => {
   let { route } = privateRoutes.find((x) => {
@@ -68,8 +69,17 @@ function Basic() {
     signIn({ link: "auth/sign-in", data: obj })
       .then((res) => {
         if (res) {
-          setUser(res.data);
-          navigate(changeRoute(obj?.role));
+          if (obj?.role === "dosen_wali") {
+            getData({ link: `dosen_wali/get_jurusan/${obj?.username}` }).then((res2) => {
+              setUser(res2.data);
+              console.log(res2?.data);
+              // navigate(changeRoute(obj?.role));
+              // navigate(changeRoute(obj?.role));
+            });
+          } else {
+            setUser(res.data);
+            navigate(changeRoute(obj?.role));
+          }
         } else {
           console.log("Login Gagal");
         }
@@ -135,12 +145,16 @@ function Basic() {
                     Name={"role"}
                     Items={[
                       {
-                        value: "prodi",
-                        label: "Prodi",
-                      },
-                      {
                         value: "admin",
                         label: "Admin",
+                      },
+                      {
+                        value: "dosen_wali",
+                        label: "Dosen wali",
+                      },
+                      {
+                        value: "prodi",
+                        label: "Prodi",
                       },
                       {
                         value: "mahasiswa",

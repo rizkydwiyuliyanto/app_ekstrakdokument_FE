@@ -429,15 +429,11 @@ function Overview() {
         console.log(err);
       });
   };
-  const profileDesc = () => {
-    return `
-        Hi, I’m ${selected?.nama_depan} ${selected?.nama_belakang}, Decisions: If you can’t decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality).
-      `;
-  };
 
   useEffect(() => {
     getSelected();
   }, []);
+  // `/master/detail_mahasiswa/edit/${selected.npm}`
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -458,7 +454,7 @@ function Overview() {
                   <Divider orientation="vertical" sx={{ ml: -2, mr: 1 }} />
                   <ProfileInfoCard
                     title="profile information"
-                    description={profileDesc()}
+                    description={""}
                     info={{
                       fullName: `${selected?.nama_depan} ${selected?.nama_belakang}`,
                       mobile: `${selected?.no_hp}`,
@@ -482,10 +478,6 @@ function Overview() {
                         color: "instagram",
                       },
                     ]}
-                    action={{
-                      route: `/master/detail_mahasiswa/edit/${selected.npm}`,
-                      tooltip: "Edit Profile",
-                    }}
                     shadow={false}
                   />
                   <Divider orientation="vertical" sx={{ mx: 0 }} />

@@ -28,6 +28,7 @@ const useAuth = () => {
       setData(null);
     } else {
       const decodeJwt = jwtDecode(userToken);
+      console.log(decodeJwt);
       setData({
         ...decodeJwt.iss,
         token: userToken,

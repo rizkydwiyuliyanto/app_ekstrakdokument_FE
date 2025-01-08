@@ -40,6 +40,8 @@ Coded by www.creative-tim.com
 import Dashboard from "layouts/admin/dashboard";
 import Prodi from "layouts/admin/prodi";
 import TambahProdi from "layouts/admin/prodi/tambah_data";
+import DosenWali from "layouts/admin/dosen_wali/index";
+import TambahDosenWali from "layouts/admin/dosen_wali/tambah_data/index";
 // Dosen wali
 import Master from "layouts/master";
 import FormTambahMahasiswa from "layouts/master/tambah_mahasiswa";
@@ -56,6 +58,8 @@ import PrivateRoute from "components/PrivateRoute";
 import Transkrip from "layouts/mahasiswa/transkrip";
 import Doc_MatkulMengulang from "layouts/document/MahasiswaMengulang";
 
+// Dosen wali
+import DosenWaliMaster from "layouts/dosenWali/master/index";
 // @mui icons
 import Icon from "@mui/material/Icon";
 import { Interceptor } from "request/Interceptor";
@@ -98,6 +102,33 @@ let admin = [
       <PrivateRoute>
         <Interceptor>
           <TambahProdi />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+  {
+    role: "admin",
+    type: "collapse",
+    name: "Dosen wali",
+    key: "dosen_wali",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "/dosen_wali",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <DosenWali />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+  {
+    role: "admin",
+    type: "sub_menu",
+    route: "/dosen_wali/tambah",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <TambahDosenWali />
         </Interceptor>
       </PrivateRoute>
     ),
@@ -242,6 +273,56 @@ let prodi = [
     ),
   },
 ];
+let dosenWali = [
+  {
+    role: "dosen_wali",
+    type: "collapse",
+    name: "Dashboard",
+    key: "dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/dashboard",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <Dashboardprodi />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+  {
+    role: "dosen_wali",
+    type: "collapse",
+    name: "Master",
+    key: "master",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "dosen_wali/master",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <DosenWaliMaster />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+  {
+    role: "dosen_wali",
+    type: "sub_menu",
+    route: "dosen_wali/master/matkul_mengulang/:userId",
+    component: <Doc_MatkulMengulang />,
+  },
+  {
+    role: "dosen_wali",
+    type: "sub_menu",
+    route: "dosen_wali/master/detail_mahasiswa/:userId",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <DetailMahasiswa />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+];
 let mahasiswa = [
   {
     role: "mahasiswa",
@@ -274,6 +355,6 @@ let mahasiswa = [
     ),
   },
 ];
-const privateRoutes = [...admin, ...prodi, ...mahasiswa];
+const privateRoutes = [...admin, ...prodi, ...mahasiswa, ...dosenWali];
 
 export default privateRoutes;
