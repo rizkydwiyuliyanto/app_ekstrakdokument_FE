@@ -39,6 +39,8 @@ const FileUpload = (props) => {
       const cek = await readCSV({ link: "mahasiswa/cek_transkrip", formData: formData });
       if (cek.data.result) {
         const { npm } = cek.data.result;
+        console.log(Id);
+        console.log(npm);
         if (npm !== Id) {
           setOpenModal(false);
           let timeOut;
@@ -48,6 +50,7 @@ const FileUpload = (props) => {
           return;
         }
       }
+      console.log(formData);
       const nilai_matkul = await readCSV({ link: "mahasiswa/ektrak", formData: formData });
       const { link, result } = nilai_matkul.data;
       const id_khs = generateRandomId(11);

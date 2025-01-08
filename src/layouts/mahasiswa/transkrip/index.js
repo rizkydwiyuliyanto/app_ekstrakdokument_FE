@@ -231,14 +231,20 @@ const HeaderKemajuanStudi = () => {
     <>
       <Box
         sx={{
-          marginBottom: "14px",
+          marginBottom: "4px",
           display: "flex",
           alignItems: "center",
+          position: "relative",
           justifyContent: "center",
           "height": "100px",
           "width": "100%"
         }}>
-        <Box sx={{ marginRight: "10px" }}>
+        <Box sx={{
+          position: "absolute",
+          left: "0",
+          top: "50%",
+          transform: "translate(0, -50%)"
+        }}>
           <img src={LogoUSTJ} width={"75px"} height={"75px"} alt={"logo"} />
         </Box>
         <Box>
@@ -256,6 +262,7 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
   const [tanggalKHS, setTanggalKHS] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [nilaiKHS, setNilaiKHS] = useState([]);
+  const [dns, setDNS] = useState({})
   const { user } = useContext(Content);
   const [loading, setLoading] = useState(true);
   const matKulRef = useRef("");
@@ -309,10 +316,22 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
     }
     return result
   }
-
+  const getDNS = () => {
+    getData({ link: "dns/mahasiswa/" + Id })
+      .then((res) => {
+        const { data } = res;
+        setDNS(data[0])
+        console.log(data)
+        // console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
   useEffect(() => {
     getTanggalKHS();
     getMataKuliah();
+    getDNS();
   }, []);
   useEffect(() => {
     if (tanggalKHS.length > 0) getKHS({ id_khs: selectedDate });
@@ -363,6 +382,25 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
             </>
           );
         })}
+                <Grid item>
+          <Stack>
+            <Typography variant="body2" style={{ marginBottom: "4px" }}>Komulatif</Typography>
+          </Stack>
+          <Stack direction={"column"} rowGap={1.5} sx={{ width: "100%" }}>
+            <Stack direction={"row"} sx={{ width: "200px" }} justifyContent={"space-between"} columnGap={1.5}>
+              <Typography variant={"caption"}>Jumlah DCP</Typography>
+              <Typography variant={"caption"} sx={{ width: "60px", fontWeight: "600" }} >: {dns?.jml_dcp_komulatif}</Typography>
+            </Stack>
+            <Stack direction={"row"} sx={{ width: "200px" }} justifyContent={"space-between"} columnGap={1.5}>
+              <Typography variant={"caption"}>Nilai SKS</Typography>
+              <Typography variant={"caption"} sx={{ width: "60px", fontWeight: "600" }} >: {dns?.ni_sks_komulatif}</Typography>
+            </Stack>
+            <Stack direction={"row"} sx={{ width: "200px" }} justifyContent={"space-between"} columnGap={1.5}>
+              <Typography variant={"caption"}>Nilai IPK</Typography>
+              <Typography variant={"caption"} sx={{ width: "60px", fontWeight: "600" }} >: {dns?.ni_ipk}</Typography>
+            </Stack>
+          </Stack>
+        </Grid>
       </Grid>
     </>
   );
