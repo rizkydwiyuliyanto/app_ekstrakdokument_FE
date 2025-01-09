@@ -72,8 +72,7 @@ function Basic() {
           if (obj?.role === "dosen_wali") {
             getData({ link: `dosen_wali/get_jurusan/${obj?.username}` }).then((res2) => {
               setUser(res2.data);
-              console.log(res2?.data);
-              // navigate(changeRoute(obj?.role));
+              navigate(changeRoute(obj?.role));
               // navigate(changeRoute(obj?.role));
             });
           } else {

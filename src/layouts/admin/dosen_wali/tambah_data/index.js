@@ -73,7 +73,7 @@ const index = () => {
     <>
       <DashboardLayout>
         <DashboardNavbar />
-        <CardParent Title={"Form edit dosen"}>
+        <CardParent Title={"Form tambah dosen wali"}>
           {messageError && (
             <Alert
               severity="error"
@@ -89,7 +89,7 @@ const index = () => {
             <form ref={formRef}>
               <GridParent>
                 <GridItems>
-                  <Col md={4} xs={12}>
+                  <Col md={6} xs={12}>
                     <SelectInput
                       Name={"nidn"}
                       Label={"Dosen *"}
@@ -103,7 +103,7 @@ const index = () => {
                       ]}
                     />
                   </Col>
-                  <Col md={4} xs={12}>
+                  <Col md={6} xs={12}>
                     <MDInput name={"password"} label="Password" fullWidth />
                   </Col>
                 </GridItems>

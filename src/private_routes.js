@@ -106,33 +106,6 @@ let admin = [
       </PrivateRoute>
     ),
   },
-  {
-    role: "admin",
-    type: "collapse",
-    name: "Dosen wali",
-    key: "dosen_wali",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/dosen_wali",
-    component: (
-      <PrivateRoute>
-        <Interceptor>
-          <DosenWali />
-        </Interceptor>
-      </PrivateRoute>
-    ),
-  },
-  {
-    role: "admin",
-    type: "sub_menu",
-    route: "/dosen_wali/tambah",
-    component: (
-      <PrivateRoute>
-        <Interceptor>
-          <TambahDosenWali />
-        </Interceptor>
-      </PrivateRoute>
-    ),
-  },
 ];
 let prodi = [
   {
@@ -272,8 +245,35 @@ let prodi = [
       </PrivateRoute>
     ),
   },
+  {
+    role: "prodi",
+    type: "collapse",
+    name: "Dosen wali",
+    key: "dosen_wali",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "/dosen_wali",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <DosenWali />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+  {
+    role: "prodi",
+    type: "sub_menu",
+    route: "/dosen_wali/tambah",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <TambahDosenWali />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
 ];
-let dosenWali = [
+let dosen_wali = [
   {
     role: "dosen_wali",
     type: "collapse",
@@ -355,6 +355,6 @@ let mahasiswa = [
     ),
   },
 ];
-const privateRoutes = [...admin, ...prodi, ...mahasiswa, ...dosenWali];
+const privateRoutes = [...admin, ...prodi, ...mahasiswa, ...dosen_wali];
 
 export default privateRoutes;

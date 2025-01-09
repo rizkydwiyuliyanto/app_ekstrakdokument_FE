@@ -128,7 +128,7 @@ const FileUpload = (props) => {
         </div>
       </Loading>
       <Dialog onClose={handleClose} open={Open}>
-        <DialogTitle>Upload KHS</DialogTitle>
+        <DialogTitle>Upload DNS</DialogTitle>
         <DialogContent>
           <DialogContentText>
             {/* To subscribe to this website, please enter your email address here. We will send updates

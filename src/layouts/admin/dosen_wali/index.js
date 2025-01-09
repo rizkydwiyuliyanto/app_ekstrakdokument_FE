@@ -28,7 +28,7 @@ const index = () => {
       <DashboardLayout>
         <DashboardNavbar />
         <CardParent
-          Title={"Data prodi"}
+          Title={"Data dosen wali"}
           ButtonComponent={() => {
             return <ButtonLinkCard Text={"Tambah data"} Link={"/dosen_wali/tambah"} />;
           }}
