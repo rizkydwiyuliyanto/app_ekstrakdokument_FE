@@ -97,7 +97,7 @@ export default function data({ header, link, primaryKey }) {
                 />
               ),
               action: (
-                <NavLink to={`/master/detail_mahasiswa/${x.npm}`}>
+                <NavLink to={`/dosen_wali/master/detail_mahasiswa/${x.npm}`}>
                   <MDTypography component="span" variant="caption" color="text" fontWeight="medium">
                     Detail
                   </MDTypography>

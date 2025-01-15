@@ -136,7 +136,7 @@ const DataMahasiswa = ({ user }) => {
           <Stack direction={"column"} rowGap={0.5} sx={{ width: "100%", marginTop: "12px" }}>
             <Stack sx={{ width: "320px" }} direction={"row"} justifyContent={"space-between"}>
               <Typography variant={"caption"} sx={{ fontWeight: 600 }}>Nama mahasiswa</Typography>
-              <Typography variant={"caption"} sx={{ fontWeight: 600, width: "190px" }}>: {user?.nama_depan + " " + user?.nama_belakang}</Typography>
+              <Typography variant={"caption"} sx={{ fontWeight: 600, width: "190px" }}>: {user?.nama}</Typography>
             </Stack>
             <Stack sx={{ width: "320px" }} direction={"row"} justifyContent={"space-between"}>
               <Typography variant={"caption"} sx={{ fontWeight: 600 }}>NPM</Typography>
@@ -145,6 +145,10 @@ const DataMahasiswa = ({ user }) => {
             <Stack sx={{ width: "320px" }} direction={"row"} justifyContent={"space-between"}>
               <Typography variant={"caption"} sx={{ fontWeight: 600 }}>Tanggal lahir</Typography>
               <Typography variant={"caption"} sx={{ fontWeight: 600, width: "190px" }}>: {tanggalLahir(user?.tanggal_lahir)}</Typography>
+            </Stack>
+            <Stack sx={{ width: "320px" }} direction={"row"} justifyContent={"space-between"}>
+              <Typography variant={"caption"} sx={{ fontWeight: 600 }}>Asal SMA</Typography>
+              <Typography variant={"caption"} sx={{ fontWeight: 600, width: "190px" }}>: {user?.asal_sma}</Typography>
             </Stack>
           </Stack>
 
@@ -157,7 +161,7 @@ const DataMahasiswa = ({ user }) => {
   )
 }
 
-const TandaTangan = () => {
+const TandaTangan = ({ Selected }) => {
   const month = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
   const getDate = () => {
     const dates = new Date();
@@ -226,7 +230,7 @@ const TandaTangan = () => {
             </Box>
             <Box>
               <Typography variant={"body2"} sx={{ fontSize: "14px", textAlign: 'center', fontWeight: "700", textDecoration: "underline", lineHeight: "1" }}>
-                {/* Dosen */}EVANITA VERONICA MANULLANG. S.T.,M.T
+                {/* Dosen */}{Selected?.nama_dosen_wali}
               </Typography>
               <Typography variant={"body2"} sx={{ fontSize: "14px", textAlign: 'center', fontWeight: "700" }}>
                 {/* Lektor */}Lektor
@@ -275,16 +279,22 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
   const [nilaiKHS, setNilaiKHS] = useState([]);
   const [dns, setDNS] = useState({})
   const [loading, setLoading] = useState(true);
+  console.log("MATKUL", Id);
   const getMataKuliah = () => {
-    getData({ link: "mata_kuliah/get_data/" + user?.id_jurusan })
-      .then((res) => {
-        const { data } = res;
-        setData(data);
-        // console.log(res);
-      })
-      .catch((err) => {
+    getData({ link: "mahasiswa/get_jurusan/" + Id })
+      .then((resp) => {
+        const { id_jurusan } = resp?.data[0];
+        getData({ link: "mata_kuliah/get_data/" + id_jurusan })
+          .then((res) => {
+            const { data } = res;
+            setData(data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }).catch(err => {
         console.log(err);
-      });
+      })
   };
 
   const getDNS = () => {
@@ -292,8 +302,6 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
       .then((res) => {
         const { data } = res;
         setDNS(data[0])
-        console.log(data)
-        // console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -303,7 +311,6 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
   const setNilaiKemajuanStudi = async () => {
     try {
       const { data } = await getData({ link: `mahasiswa/nilai_dns?npm=${Id}` });
-      console.log(data);
       setNilaiKHS(data);
     } catch (err) {
       console.log(err);
@@ -316,7 +323,6 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
     const matKul = nilaiKHS.filter(x => {
       return x.id_mata_kuliah === id_matkul
     });
-    // console.log(matKul);
     if (matKul.length > 0) {
       if (x.includes(matKul[0]?.nilai_akhir)) {
         result = matKul[0]?.nilai_akhir;
@@ -422,6 +428,7 @@ function Overview() {
     getData({ link: `mahasiswa/get_selected_data/${userId}` })
       .then((res) => {
         const { data } = res;
+        console.log(data)
         setSelected(data[0]);
         setLoading(false);
       })
@@ -456,7 +463,7 @@ function Overview() {
                     title="profile information"
                     description={""}
                     info={{
-                      fullName: `${selected?.nama_depan} ${selected?.nama_belakang}`,
+                      fullName: `${selected?.nama}`,
                       mobile: `${selected?.no_hp}`,
                       email: "",
                       location: "Indonesia",
@@ -513,7 +520,6 @@ function Overview() {
                     variant="gradient"
                     color="primary"
                     HandleClick={() => {
-                      console.log("ETE")
                       setOpen(true);
                     }}
                   >
@@ -539,7 +545,7 @@ function Overview() {
             <HeaderKemajuanStudi />
             {Object.keys(selected).length > 0 && <DataMahasiswa user={selected} />}
             <MataKuliah Id={userId} SetLinkDownload={setLinkDownload} />
-            <TandaTangan />
+            <TandaTangan Selected={selected} />
           </div>
         </MDBox>
       </Header>

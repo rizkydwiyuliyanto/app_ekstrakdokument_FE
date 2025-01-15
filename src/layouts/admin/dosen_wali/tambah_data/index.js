@@ -11,17 +11,10 @@ import BtnModal from "components/BtnModal";
 import { Col } from "react-bootstrap";
 import SelectInput from "components/SelectInput";
 import Alert from "@mui/material/Alert";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getData } from "request/request";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import { Button, Typography } from "@mui/material";
-import { convertFieldResponseIntoMuiTextFieldProps } from "@mui/x-date-pickers/internals";
-import { checkInput } from "request/request";
-import { create } from "request/request";
+import { inputUser } from "request/request";
+import { inputDataUser } from "request/request";
 // eslint-disable-next-line react/prop-types
 
 // eslint-disable-next-line react/prop-types
@@ -35,7 +28,7 @@ const index = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(formRef.current);
-    let obj = {};
+    let obj = { role: "dosen wali" };
     formData.forEach((val, key) => {
       if (val) {
         obj = {
@@ -45,20 +38,30 @@ const index = () => {
       }
     });
     setButtonDisabled(true);
-    create({ link: "dosen_wali/input", data: obj })
+    inputUser({ data: obj })
       .then((res) => {
-        setButtonDisabled(false);
-        alert("Input berhasil");
+        const { id_users } = res;
+        inputDataUser({ link: "dosen_wali/input", data: { ...obj, id_users } })
+          .then((res) => {
+            alert("Input data berhasil");
+            setButtonDisabled(false);
+            setTimeout(() => {
+              navigate("/dosen_wali");
+            });
+          })
+          .catch((err) => {
+            alert(err);
+            console.log(err);
+          });
       })
       .catch((err) => {
-        console.log(err);
+        alert(err);
       });
   };
   const getJurusan = () => {
     getData({ link: "dosen/get_data/x" })
       .then((res) => {
         const { data } = res;
-        console.log(data);
         setDataDosen(data);
         setLoading(false);
       })
@@ -89,7 +92,13 @@ const index = () => {
             <form ref={formRef}>
               <GridParent>
                 <GridItems>
-                  <Col md={6} xs={12}>
+                  <Col md={4} xs={12}>
+                    <MDInput name={"username"} label="Username *" fullWidth />
+                  </Col>
+                  <Col md={4} xs={12}>
+                    <MDInput name={"password"} label="Password" fullWidth />
+                  </Col>
+                  <Col md={4} xs={12}>
                     <SelectInput
                       Name={"nidn"}
                       Label={"Dosen *"}
@@ -102,9 +111,6 @@ const index = () => {
                         }),
                       ]}
                     />
-                  </Col>
-                  <Col md={6} xs={12}>
-                    <MDInput name={"password"} label="Password" fullWidth />
                   </Col>
                 </GridItems>
                 <BtnModal>

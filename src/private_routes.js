@@ -42,7 +42,7 @@ import Prodi from "layouts/admin/prodi";
 import TambahProdi from "layouts/admin/prodi/tambah_data";
 import DosenWali from "layouts/admin/dosen_wali/index";
 import TambahDosenWali from "layouts/admin/dosen_wali/tambah_data/index";
-// Dosen wali
+
 import Master from "layouts/master";
 import FormTambahMahasiswa from "layouts/master/tambah_mahasiswa";
 import DetailMahasiswa from "layouts/master/detail_mahasiswa";
@@ -54,6 +54,7 @@ import Dashboardprodi from "layouts/dashboard_prodi";
 import MataKuliah from "layouts/prodi/mata_kuliah";
 import TambahMataKuliah from "layouts/prodi/mata_kuliah/tambah";
 import PrivateRoute from "components/PrivateRoute";
+import DetailDosenWali from "layouts/prodi/dosen_wali/detail/index";
 // Mahasiswa
 import Transkrip from "layouts/mahasiswa/transkrip";
 import Doc_MatkulMengulang from "layouts/document/MahasiswaMengulang";
@@ -154,7 +155,7 @@ let prodi = [
   {
     role: "prodi",
     type: "sub_menu",
-    route: "/master/tambah_mahasiswa",
+    route: "/dosen_wali/tambah_mahasiswa/:id_dosen_wali",
     component: (
       <PrivateRoute>
         <Interceptor>
@@ -177,18 +178,6 @@ let prodi = [
       <PrivateRoute>
         <Interceptor>
           <FormEditMahasiswa />
-        </Interceptor>
-      </PrivateRoute>
-    ),
-  },
-  {
-    role: "prodi",
-    type: "sub_menu",
-    route: "/master/detail_mahasiswa/:userId",
-    component: (
-      <PrivateRoute>
-        <Interceptor>
-          <DetailMahasiswa />
         </Interceptor>
       </PrivateRoute>
     ),
@@ -263,11 +252,35 @@ let prodi = [
   {
     role: "prodi",
     type: "sub_menu",
+    route: "/dosen_wali/:id_dosen_wali",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <DetailDosenWali />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+  {
+    role: "prodi",
+    type: "sub_menu",
     route: "/dosen_wali/tambah",
     component: (
       <PrivateRoute>
         <Interceptor>
           <TambahDosenWali />
+        </Interceptor>
+      </PrivateRoute>
+    ),
+  },
+  {
+    role: "prodi",
+    type: "sub_menu",
+    route: "/dosen_wali/detail_mahasiswa/:userId",
+    component: (
+      <PrivateRoute>
+        <Interceptor>
+          <DetailMahasiswa />
         </Interceptor>
       </PrivateRoute>
     ),

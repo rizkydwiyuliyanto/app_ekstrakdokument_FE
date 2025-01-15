@@ -150,7 +150,11 @@ export default function App() {
   );
   let selectRoutes = user
     ? privateRoutes.filter((x) => {
-        return x.role === user.role;
+        let role = user.role;
+        if (user?.role == "dosen wali") {
+          role = user?.role.split(" ").join("_");
+        }
+        return x.role === role;
       })
     : [];
   return direction === "rtl" ? (

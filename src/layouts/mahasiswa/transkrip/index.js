@@ -121,7 +121,11 @@ const PilihTanggal = (props) => {
 
 const DataMahasiswa = () => {
   const { user, setUser } = useContext(Content);
-
+  const tanggalLahir = (date) => {
+    const a = new Date(date);
+    const month = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+    return `${a?.getDate()} ${month[a.getMonth()]}, ${a.getFullYear()}`
+  }
   return (
     <>
       <Box sx={{ marginBottom: "16.5px", display: "flex", justifyContent: "space-between", width: "70%" }}>
@@ -129,11 +133,24 @@ const DataMahasiswa = () => {
           <Typography variant={"h6"} sx={{ fontSize: 12.5, lineHeight: 1.10 }}>
             Kemajuan studi
           </Typography>
-          <Box>
-            <Typography variant={"body1"} sx={{ lineHeight: "2", fontSize: 12, color: "black", fontWight: "700" }}>Nama: {user?.nama_depan + " " + user?.nama_belakang}, NPM: {user?.npm}</Typography>
-            {/* <Typography variant={"body1"} sx={{ lineHeight: "2", fontSize: 12, color: "black", fontWight: "700" }}>Nama: {user?.nama_depan + " " + user?.nama_belakang}</Typography>
-            <Typography variant={"body1"} sx={{ lineHeight: "2", fontSize: 12, color: "black", fontWight: "700" }}>No. HP: {user?.no_hp}</Typography> */}
-          </Box>
+          <Stack direction={"column"} rowGap={0.5} sx={{ width: "100%", marginTop: "12px" }}>
+            <Stack sx={{ width: "320px" }} direction={"row"} justifyContent={"space-between"}>
+              <Typography variant={"caption"} sx={{ fontWeight: 600 }}>Nama mahasiswa</Typography>
+              <Typography variant={"caption"} sx={{ fontWeight: 600, width: "190px" }}>: {user?.nama}</Typography>
+            </Stack>
+            <Stack sx={{ width: "320px" }} direction={"row"} justifyContent={"space-between"}>
+              <Typography variant={"caption"} sx={{ fontWeight: 600 }}>NPM</Typography>
+              <Typography variant={"caption"} sx={{ fontWeight: 600, width: "190px" }}>: {user?.npm}</Typography>
+            </Stack>
+            <Stack sx={{ width: "320px" }} direction={"row"} justifyContent={"space-between"}>
+              <Typography variant={"caption"} sx={{ fontWeight: 600 }}>Tanggal lahir</Typography>
+              <Typography variant={"caption"} sx={{ fontWeight: 600, width: "190px" }}>: {tanggalLahir(user?.tanggal_lahir)}</Typography>
+            </Stack>
+            <Stack sx={{ width: "320px" }} direction={"row"} justifyContent={"space-between"}>
+              <Typography variant={"caption"} sx={{ fontWeight: 600 }}>Asal SMA</Typography>
+              <Typography variant={"caption"} sx={{ fontWeight: 600, width: "190px" }}>: {user?.asal_sma}</Typography>
+            </Stack>
+          </Stack>
 
         </Box>
         {/* <Box>
@@ -144,7 +161,7 @@ const DataMahasiswa = () => {
   )
 }
 
-const TandaTangan = () => {
+const TandaTangan = ({ Selected }) => {
   const month = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
   const getDate = () => {
     const dates = new Date();
@@ -177,7 +194,7 @@ const TandaTangan = () => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            height: "100px"
+            height: "120px"
           }}>
             <Box>
               <Typography sx={{ textAlign: 'center', fontSize: "14px", lineHeight: "1" }} variant={"body2"}>
@@ -186,10 +203,10 @@ const TandaTangan = () => {
             </Box>
             <Box>
               <Typography variant={"body2"} sx={{ fontSize: "14px", textAlign: 'center', fontWeight: "700", textDecoration: "underline", lineHeight: "1" }}>
-                {/* Dosen */}_____
+                {/* Dosen */}RIZKIAL ACHMAD, S.Kom.,M.T
               </Typography>
               <Typography variant={"body2"} sx={{ fontSize: "14px", textAlign: 'center', fontWeight: "700" }}>
-                {/* Lektor */}
+                {/* Lektor */}Lektor
               </Typography>
             </Box>
           </Box>
@@ -204,7 +221,7 @@ const TandaTangan = () => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            height: "100px"
+            height: "120px"
           }}>
             <Box>
               <Typography sx={{ textAlign: 'center', fontSize: "14px", lineHeight: "1" }} variant={"body2"}>
@@ -213,10 +230,10 @@ const TandaTangan = () => {
             </Box>
             <Box>
               <Typography variant={"body2"} sx={{ fontSize: "14px", textAlign: 'center', fontWeight: "700", textDecoration: "underline", lineHeight: "1" }}>
-                {/* Dosen */}_____
+                {/* Dosen */}{Selected?.nama_dosen_wali}
               </Typography>
               <Typography variant={"body2"} sx={{ fontSize: "14px", textAlign: 'center', fontWeight: "700" }}>
-                {/* Lektor */}
+                {/* Lektor */}Lektor
               </Typography>
             </Box>
           </Box>
@@ -291,7 +308,7 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
       });
   }
   const getMataKuliah = () => {
-    getData({ link: "mata_kuliah/get_data/"+user?.id_jurusan })
+    getData({ link: "mata_kuliah/get_data/" + user?.id_jurusan })
       .then((res) => {
         const { data } = res;
         setData(data);
@@ -382,7 +399,7 @@ const MataKuliah = ({ Id, SetLinkDownload }) => {
             </>
           );
         })}
-                <Grid item>
+        <Grid item>
           <Stack>
             <Typography variant="body2" style={{ marginBottom: "4px" }}>Komulatif</Typography>
           </Stack>
@@ -525,7 +542,7 @@ function Overview() {
             <HeaderKemajuanStudi />
             <DataMahasiswa />
             <MataKuliah Id={user.npm} />
-            <TandaTangan />
+            <TandaTangan Selected={selected}/>
           </div>
         </MDBox>
       </Header>

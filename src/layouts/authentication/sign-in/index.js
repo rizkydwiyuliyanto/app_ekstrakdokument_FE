@@ -42,8 +42,12 @@ import privateRoutes from "private_routes";
 import { getData } from "request/request";
 
 const changeRoute = (role) => {
+  let a = role;
+  if (role == "dosen wali") {
+    a = role.split(" ").join("_");
+  }
   let { route } = privateRoutes.find((x) => {
-    return x.role === role;
+    return x.role === a;
   });
   return route;
 };
@@ -69,16 +73,27 @@ function Basic() {
     signIn({ link: "auth/sign-in", data: obj })
       .then((res) => {
         if (res) {
-          if (obj?.role === "dosen_wali") {
-            getData({ link: `dosen_wali/get_jurusan/${obj?.username}` }).then((res2) => {
-              setUser(res2.data);
-              navigate(changeRoute(obj?.role));
-              // navigate(changeRoute(obj?.role));
+          const { data } = res;
+          const { id_users, role } = data[0];
+          getData({ link: `auth/user_data?id_user=${id_users}&role=${role}` })
+            .then((res) => {
+              setUser(res.data);
+              let role = obj?.role;
+              navigate(changeRoute(role));
+            })
+            .catch((err) => {
+              console.log(err);
             });
-          } else {
-            setUser(res.data);
-            navigate(changeRoute(obj?.role));
-          }
+          // if (obj?.role === "dosen_wali") {
+          //   getData({ link: `dosen_wali/get_jurusan/${obj?.username}` }).then((res2) => {
+          //     setUser(res2.data);
+          //     navigate(changeRoute(obj?.role));
+          //     navigate(changeRoute(obj?.role));
+          //   });
+          // } else {
+          // setUser(res.data);
+          // navigate(changeRoute(obj?.role));
+          // }
         } else {
           console.log("Login Gagal");
         }
@@ -148,7 +163,7 @@ function Basic() {
                         label: "Admin",
                       },
                       {
-                        value: "dosen_wali",
+                        value: "dosen wali",
                         label: "Dosen wali",
                       },
                       {

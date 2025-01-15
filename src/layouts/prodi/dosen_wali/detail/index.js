@@ -28,7 +28,7 @@ import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 
 // Data
-import tableMahasiswa from "layouts/dosenWali/master/data/tableMahasiswa";
+import tableMahasiswa from "layouts/prodi/dosen_wali/detail/data/tableMahasiswa";
 import { useContext, useEffect, useRef, useState } from "react";
 import MDButton from "components/MDButton";
 import { Box, Container, Typography } from "@mui/material";
@@ -36,10 +36,11 @@ import CardParent from "components/CardParent";
 import ButtonLinkCard from "components/ButtonCardLink";
 import Link from "@mui/material/Link";
 import { Content } from "context/user-context";
+import { useParams } from "react-router-dom";
 function Tables() {
   const [id, setId] = useState("");
   const { user, setUser } = useContext(Content);
-  console.log(user);
+  const { id_dosen_wali } = useParams();
   const { dataMahasiswa, loading_mhs, reload_mhs } = tableMahasiswa({
     header: [
       {
@@ -54,7 +55,7 @@ function Tables() {
       // { Header: "employed", accessor: "employed", align: "center" },
       { Header: "action", accessor: "action", align: "center" },
     ],
-    link: "mahasiswa/get_data/" + user?.id_dosen_wali,
+    link: "mahasiswa/get_data/" + id_dosen_wali,
     SetID: setId,
     primaryKey: "npm",
   });
@@ -63,7 +64,17 @@ function Tables() {
       <DashboardLayout>
         <DashboardNavbar />
         <>
-          <CardParent Title={"Data mahasiswa"}>
+          <CardParent
+            Title={"Data mahasiswa"}
+            ButtonComponent={() => {
+              return (
+                <ButtonLinkCard
+                  Text={"Tambah data"}
+                  Link={"/dosen_wali/tambah_mahasiswa/" + id_dosen_wali}
+                />
+              );
+            }}
+          >
             {loading_mhs ? (
               <Container>
                 <Typography variant={"caption"}>Loading...</Typography>

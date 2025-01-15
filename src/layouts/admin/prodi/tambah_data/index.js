@@ -22,6 +22,8 @@ import { Button, Typography } from "@mui/material";
 import { convertFieldResponseIntoMuiTextFieldProps } from "@mui/x-date-pickers/internals";
 import { checkInput } from "request/request";
 import { create } from "request/request";
+import { inputUser } from "request/request";
+import { inputDataUser } from "request/request";
 // eslint-disable-next-line react/prop-types
 const FormAddJurusan = ({ SetJurusan, HandleClose, Open }) => {
   const [messageError, setMessageError] = React.useState("");
@@ -38,8 +40,6 @@ const FormAddJurusan = ({ SetJurusan, HandleClose, Open }) => {
             const formData = new FormData(event.target);
             console.log(formData);
             // const isEmpty = formData.
-            let count = 0;
-            let inputName = "";
             formData.forEach((val, key) => {
               obj = {
                 ...obj,
@@ -64,7 +64,7 @@ const FormAddJurusan = ({ SetJurusan, HandleClose, Open }) => {
           },
         }}
       >
-        <DialogTitle>Subscribe</DialogTitle>
+        <DialogTitle>Tambah jurusan</DialogTitle>
         <DialogContent>
           {/* <DialogContentText>
             To subscribe to this website, please enter your email address here. We will send updates
@@ -90,7 +90,7 @@ const FormAddJurusan = ({ SetJurusan, HandleClose, Open }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={HandleClose}>Cancel</Button>
-          <Button type="submit">Subscribe</Button>
+          <Button type="submit">Submit</Button>
         </DialogActions>
       </Dialog>
     </>
@@ -108,8 +108,8 @@ const index = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(formRef.current);
-    let obj = {};
     let column = ["id_jurusan"];
+    let obj = {};
     formData.forEach((val, key) => {
       if (!column.includes(key)) {
         if (val) {
@@ -123,16 +123,19 @@ const index = () => {
     if (formData.get("id_jurusan")) {
       obj = {
         ...obj,
+        role: "prodi",
         id_jurusan: formData.get("id_jurusan").split("-")[0],
-        jurusan: formData.get("id_jurusan").split("-")[1],
       };
     }
-    console.log(obj);
-    create({ link: "prodi/input_jurusan", data: obj })
+    inputUser({ data: obj })
       .then((res) => {
-        create({ link: "prodi/input_prodi", data: obj })
+        const { id_users } = res;
+        inputDataUser({ link: "prodi/input_prodi", data: { ...obj, id_users } })
           .then((res) => {
-            console.log(res);
+            alert("Input data berhasil");
+            setTimeout(() => {
+              navigate("/prodi");
+            });
           })
           .catch((err) => {
             console.log(err);
@@ -168,7 +171,7 @@ const index = () => {
       />
       <DashboardLayout>
         <DashboardNavbar />
-        <CardParent Title={"Form edit dosen"}>
+        <CardParent Title={"Form tambah prodi"}>
           {messageError && (
             <Alert
               severity="error"

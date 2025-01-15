@@ -41,25 +41,6 @@ function Tables() {
   const [id, setId] = useState("");
   const { user, setUser } = useContext(Content);
 
-  const { dataMahasiswa, loading_mhs, reload_mhs } = tableMahasiswa({
-    header: [
-      {
-        Header: "mahasiswa",
-        accessor: "mahasiswa",
-        name: "mahasiswa",
-        width: "20%",
-        align: "left",
-      },
-      { Header: "npm", accessor: "npm", name: "npm", align: "left" },
-      { Header: "no_hp", accessor: "no_hp", name: "no_hp", align: "center" },
-      // { Header: "employed", accessor: "employed", align: "center" },
-      { Header: "action", accessor: "action", align: "center" },
-    ],
-    link: "mahasiswa/get_data/" + user?.id_jurusan,
-    SetID: setId,
-    primaryKey: "npm",
-  });
-
   const { dataDosen, loading_dsn, reload_dsn } = tableDosen({
     header: [
       { Header: "dosen", accessor: "dosen", name: "dosen", width: "40%", align: "left" },
@@ -99,32 +80,6 @@ function Tables() {
                 entriesPerPage={false}
                 showTotalEntries={false}
                 ReloadData={reload_dsn}
-                noEndBorder
-              />
-            )}
-          </CardParent>
-          <CardParent
-            Title={"Data mahasiswa"}
-            ButtonComponent={() => {
-              return <ButtonLinkCard Text={"Tambah data"} Link={"/master/tambah_mahasiswa"} />;
-            }}
-          >
-            {loading_mhs ? (
-              <Container>
-                <Typography variant={"caption"}>Loading...</Typography>
-              </Container>
-            ) : (
-              <DataTable
-                table={{
-                  columns: dataMahasiswa["columns"],
-                  rows: dataMahasiswa["rows"],
-                  ids: dataMahasiswa["id"],
-                }}
-                isSorted={false}
-                DeleteLink={"mahasiswa/delete_mhs"}
-                entriesPerPage={false}
-                showTotalEntries={false}
-                ReloadData={reload_mhs}
                 noEndBorder
               />
             )}

@@ -32,11 +32,18 @@ import TextRow from "components/TextRow";
 import { getData } from "request/request";
 import { useLocation, NavLink } from "react-router-dom";
 
-export default function data({ header, link }) {
+export default function data({ header, link, primaryKey }) {
   const [fetch, setFetch] = useState({
     columns: header,
     rows: [],
+    id: [],
   });
+  Date.prototype.yyyymmdd = function () {
+    var mm = this.getMonth() + 1; // getMonth() is zero-based
+    var dd = this.getDate();
+
+    return [this.getFullYear(), (mm > 9 ? "" : "0") + mm, (dd > 9 ? "" : "0") + dd].join("-");
+  };
   const [loading, setLoading] = useState(true);
   const avatarItems = [team2, team3, team4];
   const fetchRows = (obj) => {
@@ -51,15 +58,34 @@ export default function data({ header, link }) {
     }
     getData({ link: `${link}${obj ? `?${str}` : ""}` })
       .then((res) => {
-        console.log(res);
         setFetch({
           ...fetch,
+          id: res.data.map((x) => {
+            return x[primaryKey];
+          }),
           rows: res.data.map((x, idx) => {
+            let avatar;
+            if (x.foto) {
+              avatar = x.foto;
+            } else {
+              if (x.jenis_kelamin === "Laki-laki") {
+                avatar = male;
+              } else {
+                avatar = female;
+              }
+            }
             return {
               dosen: (
                 <TextRow
-                  // AvatarImage={team2}
+                  AvatarImage={avatar}
                   FirstText={x.dosen}
+                  SecondText={new Date(x.tanggal_lahir).yyyymmdd()}
+                />
+              ),
+              nidn: (
+                <TextRow
+                  // AvatarImage={team2}
+                  FirstText={x.nidn}
                 />
               ),
               no_hp: (
@@ -68,28 +94,14 @@ export default function data({ header, link }) {
                   FirstText={x.no_hp}
                 />
               ),
-              jurusan: <TextRow FirstText={x.jurusan} SecondText={x.id_jurusan} />,
               action: (
-                <NavLink to={"/dosen_wali/" + x?.id_dosen_wali}>
+                // /master/edit_dosen
+                <NavLink to={`/master/detail_dosen/${x.nidn}`}>
                   <MDTypography component="span" variant="caption" color="text" fontWeight="medium">
                     Detail
                   </MDTypography>
                 </NavLink>
               ),
-              // no_hp: (
-              //   <TextRow
-              //     // AvatarImage={team2}
-              //     FirstText={x.jurusan}
-              //   />
-              // ),
-              // action: (
-              //   // /master/edit_dosen
-              //   <NavLink to={`/master/detail_dosen/${x.nidn}`}>
-              //     <MDTypography component="span" variant="caption" color="text" fontWeight="medium">
-              //       Detail
-              //     </MDTypography>
-              //   </NavLink>
-              // ),
             };
           }),
         });
@@ -106,9 +118,9 @@ export default function data({ header, link }) {
   }, []);
 
   return {
-    data: fetch,
-    loading: loading,
-    reload: (obj) => {
+    dataDosen: fetch,
+    loading_dsn: loading,
+    reload_dsn: (obj) => {
       // setLoading(true);
       fetchRows(obj);
     },

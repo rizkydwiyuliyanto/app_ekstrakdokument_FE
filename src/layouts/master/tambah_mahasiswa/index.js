@@ -21,9 +21,11 @@ import { Button, TextField, Typography } from "@mui/material";
 import { create } from "request/request";
 import { inputFoto } from "request/request";
 import CardParent from "components/CardParent";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { readCSV } from "request/request";
 import { Content } from "context/user-context";
+import { inputUser } from "request/request";
+import { inputDataUser } from "request/request";
 const CSVData = ({ data, setData }) => {
   const formRef = React.useRef([]);
   const refWait = React.useRef([]);
@@ -31,6 +33,7 @@ const CSVData = ({ data, setData }) => {
   const refSuccess = React.useRef([]);
   const [btnDisabled, setBtnDisabled] = React.useState(false);
   const { user } = React.useContext(Content);
+  const { id_dosen_wali } = useParams();
   const postData = (idx) => {
     let currentIdx = idx;
     const can_continue = (time) => {
@@ -64,19 +67,32 @@ const CSVData = ({ data, setData }) => {
     refWait.current[currentIdx].style.display = "block";
     refError.current[currentIdx].style.display = "none";
     refSuccess.current[currentIdx].style.display = "none";
-    create({ link: "mahasiswa/input", data: obj })
+    const success = () => {
+      refWait.current[currentIdx].style.display = "none";
+      refSuccess.current[currentIdx].style.display = "flex";
+      refSuccess.current[currentIdx].lastElementChild.textContent = "Data berhasil ditambah";
+    };
+    const failed = (err) => {
+      refWait.current[currentIdx].style.display = "none";
+      refError.current[currentIdx].style.display = "flex";
+      refError.current[currentIdx].lastElementChild.textContent = err;
+    };
+    inputUser({ data: { ...obj, role: "mahasiswa" } })
       .then((res) => {
-        refWait.current[currentIdx].style.display = "none";
-        refSuccess.current[currentIdx].style.display = "flex";
-        refSuccess.current[currentIdx].lastElementChild.textContent = "Data berhasil ditambah";
-        can_continue(450);
+        const { id_users } = res;
+        inputDataUser({ link: "mahasiswa/input", data: { ...obj, id_users, id_dosen_wali } })
+          .then((res) => {
+            success();
+            can_continue(450);
+          })
+          .catch((err) => {
+            failed(err);
+            can_continue(450);
+          });
       })
       .catch((err) => {
-        refWait.current[currentIdx].style.display = "none";
-        refError.current[currentIdx].style.display = "flex";
-        refError.current[currentIdx].lastElementChild.textContent = err;
+        failed();
         can_continue(450);
-        // setMessageError(err);
       });
   };
   const deleteData = (idx) => {
@@ -101,17 +117,12 @@ const CSVData = ({ data, setData }) => {
               </Col>
               <Col sm={"2"}>
                 <Typography variant={"h6"} align={"center"}>
-                  Nama depan
+                  Nama
                 </Typography>
               </Col>
               <Col sm={"2"}>
                 <Typography variant={"h6"} align={"center"}>
-                  Nama belakang
-                </Typography>
-              </Col>
-              <Col sm={"2"}>
-                <Typography variant={"h6"} align={"center"}>
-                  Password
+                  Asal SMA
                 </Typography>
               </Col>
               <Col sm={"2"}>
@@ -127,6 +138,16 @@ const CSVData = ({ data, setData }) => {
               </Col>
               <Col sm={"3"}>
                 <Typography variant={"h6"}>Alamat</Typography>
+              </Col>
+              <Col sm={"2"}>
+                <Typography variant={"h6"} align={"center"}>
+                  Username
+                </Typography>
+              </Col>
+              <Col sm={"2"}>
+                <Typography variant={"h6"} align={"center"}>
+                  Password
+                </Typography>
               </Col>
             </Stack>
           </div>
@@ -184,21 +205,10 @@ const CSVData = ({ data, setData }) => {
                       <TextField name={"npm"} defaultValue={x["npm"]} fullWidth />
                     </Col>
                     <Col sm={"2"}>
-                      <TextField name={"nama_depan"} defaultValue={x["nama_depan"]} fullWidth />
+                      <TextField name={"nama"} defaultValue={x["nama"]} fullWidth />
                     </Col>
                     <Col sm={"2"}>
-                      <TextField
-                        name={"nama_belakang"}
-                        defaultValue={x["nama_belakang"]}
-                        fullWidth
-                      />
-                    </Col>
-                    <Col sm={"2"}>
-                      <TextField
-                        name={"password"}
-                        defaultValue={x["password"] || "123"}
-                        fullWidth
-                      />
+                      <TextField name={"asal_sma"} defaultValue={x["asal_sma"]} fullWidth />
                     </Col>
                     <Col sm={"2"}>
                       <TextField name={"no_hp"} defaultValue={x["no_hp"]} fullWidth />
@@ -237,6 +247,16 @@ const CSVData = ({ data, setData }) => {
                         fullWidth
                       />
                       {/* <TextField size={"small"} defaultValue={x["alamat"]} fullWidth /> */}
+                    </Col>
+                    <Col sm={"2"}>
+                      <TextField name={"username"} defaultValue={x["npm"] || "123"} fullWidth />
+                    </Col>
+                    <Col sm={"2"}>
+                      <TextField
+                        name={"password"}
+                        defaultValue={x["password"] || "123"}
+                        fullWidth
+                      />
                     </Col>
                   </Stack>
                 </form>
