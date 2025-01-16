@@ -106,7 +106,7 @@ const index = () => {
                         ...dataDosen.map((x) => {
                           return {
                             value: x?.nidn,
-                            label: x?.nama_depan + " " + x?.nama_belakang + " - " + x?.jurusan,
+                            label: x?.nama + x?.jurusan,
                           };
                         }),
                       ]}
